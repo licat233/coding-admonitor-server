@@ -1,0 +1,40 @@
+model: dev #当前模式 dev || pro
+mysql:
+  addr: localhost:3306
+  user: root
+  password: ""
+  password2: "123123123"
+  db: monitor_data
+  params: charset=utf8mb4&parseTime=True&loc=Local
+  maxIdleConns: 10 #设置最大空闲连接
+  maxOpenConns: 100 #设置最大连接数
+  log-level: error #日志级别
+redis:
+  addr: 127.0.0.1:6379
+  pass: ""
+line:
+  cookie: "_ga=GA1.2.1836409966.1649564128; _gid=GA1.2.1986311929.1649564128; _gat_gtag_UA_124047556_1=1; ses=tiVC+tO8+hB5GEVR9qpBkj/QRAF2KxCGmiYreub38KZ0AiL7f8czUcQA7mxagv86jie+2cluRlezSYSJHJjK0Oyw0t1WXruozRw7BdDkFY3vSQeI8mGxHG2s1K5k6jjgbpE0a72/GA8/fX9D5ROW+6icTrZ+vIv2NrGUGSdTa7C5YdacWmJdg4JeQc9eT5hvRIVjKCN3uH/3cW0x+UJnZJr0xrvMoqoJi1O1dwS+p+DROIXgH+LTGj1RcAqzqbSSjrIC831qGY6D0jcXmVggaXebVq2OK6/hnudLuTFU4/7YbBzXEVyfYxYj6LmTkFvnFvzHrGSbJ5rwZlzn9u0FMZy15wlaMbqgvvKXg92MbtWccytzK1gKS/MXJxrnHV2mZwkEsFYBgYbhYx2UxYidjpewY/h1xJk8SQSR0gKAtwrn8yz3nXC/3gdICbvDvVRiIPzM99ry7LXMArtjj1eJBfg==; _mkto_trk=id:872-KNP-101&token:_mch-line.biz-1649564144984-86102"
+  table: line #mysql数据表
+  account-list:
+    - account: A28490221213
+      nickname: 自操line3户
+      status: on #是否监控
+    - account: A96457201158
+      nickname: 自操line2户
+      status: off #是否监控
+    - account: A97230191467
+      nickname: 自操line1户
+      status: off #是否监控
+popin:
+  cookie: ""
+  table: popin
+  account-list:
+    - account: Wang_skin01
+      nickname: 鸡皮肤1户
+      status: on #是否监控
+    - account: Wang_skin02
+      nickname: 鸡皮肤2户
+      status: off #是否监控
+    - account: Self_White2
+      nickname: 祛斑2户
+      status: off #是否监控
