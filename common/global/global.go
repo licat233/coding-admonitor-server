@@ -1,7 +1,7 @@
 package global
 
 import (
-	"monitor-data/common/timer"
+	"admonitor-server/common/timer"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"

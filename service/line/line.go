@@ -1,9 +1,10 @@
 package line
 
 import (
+	"admonitor-server/common/global"
+	"admonitor-server/common/timer"
+	"admonitor-server/service/line/logic"
 	"fmt"
-	"monitor-data/common/timer"
-	"monitor-data/service/line/logic"
 )
 
 type LineServer struct {
@@ -31,6 +32,8 @@ func (a *LineServer) Start() {
 	a.Timer.AddTaskByFunc("LineNodeData", "30 30 9 * * *", a.LineLogic.InsertNodeData)
 	//每天早上 9:32，新建昨日的逻辑line消耗数据
 	a.Timer.AddTaskByFunc("YesterdayLineLogicData", "0 32 9 * * *", a.LineLogic.InsertYesterdayLogicData)
+	//服务巡逻监控
+	a.Timer.AddTaskByFunc("LineNewestData", "0 */1 * * * *", a.monitorLineServer)
 	//开始任务
 	a.Timer.StartTask("LineNewestData")
 	a.Timer.StartTask("CurrentLineLogicData")
@@ -50,4 +53,11 @@ func (a *LineServer) Restart() {
 	a.Stop()
 	a.Start()
 	fmt.Println("LineServer已重启")
+}
+
+func (a *LineServer) monitorLineServer() {
+	if a.LineLogic.Spider.Close {
+		a.Stop()
+		global.LOG.Info("因为Spider已关闭，LineServer已经停止运行")
+	}
 }

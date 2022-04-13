@@ -1,8 +1,11 @@
 package logic
 
 import (
+	"admonitor-server/common/errorx"
+	"admonitor-server/common/global"
+	"admonitor-server/service/model"
 	"errors"
-	"monitor-data/service/line/model"
+	"fmt"
 )
 
 type LineLogic struct {
@@ -52,7 +55,16 @@ func (l *LineLogic) UpdateCurrentLogicData() {
 
 //safeRun 截断器
 func (l *LineLogic) safeRun(fn func()) {
-	defer recover()
+	defer func() {
+		err := recover()
+		if err != nil {
+			if v, ok := err.(error); ok {
+				global.LOG.Error(errorx.New("已经暂停服务", v))
+			} else {
+				fmt.Println(err)
+			}
+		}
+	}()
 	if l.Spider.Close {
 		panic(errors.New("spider已关闭"))
 	}

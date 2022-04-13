@@ -1,12 +1,12 @@
 package logic
 
 import (
+	"admonitor-server/common/errorx"
+	"admonitor-server/common/global"
+	"admonitor-server/common/utils"
+	"admonitor-server/service/model"
 	"errors"
 	"fmt"
-	"monitor-data/common/errorx"
-	"monitor-data/common/global"
-	"monitor-data/common/utils"
-	"monitor-data/service/line/model"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -15,7 +15,7 @@ import (
 )
 
 //spiderLineData 爬取line数据
-func (l *LineLogic) spiderLineData(date time.Time, Type int) (lines []*model.Line) {
+func (l *LineLogic) spiderLineData(date time.Time, Type string) (lines []*model.Line) {
 	respData := l.Spider.Do(date)
 	if respData == nil {
 		global.LOG.Error(errorx.New("data为nil", errors.New("Spider获取line广告数据失败")))
@@ -30,9 +30,9 @@ func (l *LineLogic) spiderLineData(date time.Time, Type int) (lines []*model.Lin
 		for _, data := range datas {
 			if data.Id == account.Account {
 				statistic := &data.Statistics
-				var status uint8
+				var status bool
 				if data.DeliveryStatus == "ACTIVE" {
-					status = 1
+					status = true
 				}
 				line := &model.Line{
 					Account:    account.Account,
@@ -44,7 +44,7 @@ func (l *LineLogic) spiderLineData(date time.Time, Type int) (lines []*model.Lin
 					Cvr:        statistic.Cvr,
 					Cpa:        statistic.Cpa,
 					Status:     status,
-					Type:       uint8(Type),
+					Type:       Type,
 					Currency:   statistic.Currency,
 					RecordDate: date,
 					CreateAt:   time.Time{},
@@ -58,10 +58,10 @@ func (l *LineLogic) spiderLineData(date time.Time, Type int) (lines []*model.Lin
 }
 
 /** createLineData 创建line的广告数据到数据库
- * @param Type type int 操作的数据类型：model.NEWEST，model.NODE，model.DAY
+ * @param Type Type string 操作的数据类型：model.NEWEST，model.NODE，model.DAY
  * @param replace type bool 如果存在，是否替换？
  */
-func (l *LineLogic) createLineData(Type int, replace bool) {
+func (l *LineLogic) createLineData(Type string, replace bool) {
 	if l.Spider.Close {
 		return
 	}
@@ -77,7 +77,7 @@ func (l *LineLogic) createLineData(Type int, replace bool) {
 }
 
 //ReplaceData 插入数据到数据库，根据replace判断是否替换
-func (l *LineLogic) InsertLineData(lineData *model.Line, date time.Time, Type int, replace bool) {
+func (l *LineLogic) InsertLineData(lineData *model.Line, date time.Time, Type string, replace bool) {
 	if lineData == nil {
 		global.LOG.Error("插入的lineData数据为空")
 		return
@@ -281,7 +281,7 @@ func (l *LineLogic) LogicLineDataByDate(account string, date time.Time) (*model.
 			Cv:         0,
 			Cvr:        0,
 			Cpa:        0,
-			Status:     0,
+			Status:     false,
 			Type:       model.NODE,
 			Currency:   "",
 			RecordDate: date,

@@ -24,13 +24,17 @@ is_out_page: true # 是否输出分页函数
 db_info:
     host : 127.0.0.1 # type=1的时候，host为yml文件全路径
     port : 3306
-    username : root
-    password : 123456
-    database : matrix
+    username : Admonitor
+    password : imih7kNDasGJ6dFP
+    database : admonitor
     type: 0 # 数据库类型:0:mysql , 1:sqlite , 2:mssql
 self_type_define: # 自定义数据类型映射
     datetime: time.Time
     time: time.Time
+    int: int64
+    tinyint: bool
+    decimal: float64
+    float: float64
 out_file_name: "" # 自定义生成文件名
 web_tag_type: 0 # json tag类型 0: 小驼峰 1: 下划线
 

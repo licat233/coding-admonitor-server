@@ -3,9 +3,9 @@ package logic
 type RespData struct {
 	Datas  []AccountCostData `json:"datas"`
 	Paging struct {
-		Page          int      `json:"page"`
-		Size          int      `json:"size"`
-		TotalElements int      `json:"total_elements"`
+		Page          int64    `json:"page"`
+		Size          int64    `json:"size"`
+		TotalElements int64    `json:"total_elements"`
 		Sorts         []string `json:"sorts"`
 	} `json:"paging"`
 	ReportCommand struct {
@@ -36,9 +36,9 @@ type AccountInfo struct {
 }
 
 type Statistics struct {
-	Imp            uint    `json:"imp"`
-	Click          uint    `json:"click"`
-	Cv             uint    `json:"cv"`
+	Imp            int64   `json:"imp"`
+	Click          int64   `json:"click"`
+	Cv             int64   `json:"cv"`
 	Ctr            float64 `json:"ctr"`
 	Cvr            float64 `json:"cvr"`
 	Cpm            float64 `json:"cpm"`

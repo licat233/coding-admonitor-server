@@ -1,4 +1,4 @@
-module monitor-data
+module admonitor-server
 
 go 1.18
 

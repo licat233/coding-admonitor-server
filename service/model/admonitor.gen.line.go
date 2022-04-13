@@ -55,7 +55,7 @@ func (obj *_LineMgr) Count(count *int64) (tx *gorm.DB) {
 //////////////////////////option case ////////////////////////////////////////////
 
 // WithID id获取 主键
-func (obj *_LineMgr) WithID(id uint) Option {
+func (obj *_LineMgr) WithID(id int64) Option {
 	return optionFunc(func(o *options) { o.query["id"] = id })
 }
 
@@ -70,12 +70,12 @@ func (obj *_LineMgr) WithCost(cost float64) Option {
 }
 
 // WithClick click获取 点击数
-func (obj *_LineMgr) WithClick(click uint) Option {
+func (obj *_LineMgr) WithClick(click int64) Option {
 	return optionFunc(func(o *options) { o.query["click"] = click })
 }
 
 // WithImp imp获取 展现量
-func (obj *_LineMgr) WithImp(imp uint) Option {
+func (obj *_LineMgr) WithImp(imp int64) Option {
 	return optionFunc(func(o *options) { o.query["imp"] = imp })
 }
 
@@ -85,7 +85,7 @@ func (obj *_LineMgr) WithCtr(ctr float64) Option {
 }
 
 // WithCv cv获取 转化数
-func (obj *_LineMgr) WithCv(cv uint) Option {
+func (obj *_LineMgr) WithCv(cv int64) Option {
 	return optionFunc(func(o *options) { o.query["cv"] = cv })
 }
 
@@ -100,12 +100,12 @@ func (obj *_LineMgr) WithCpa(cpa float64) Option {
 }
 
 // WithStatus status获取 状态
-func (obj *_LineMgr) WithStatus(status uint8) Option {
+func (obj *_LineMgr) WithStatus(status bool) Option {
 	return optionFunc(func(o *options) { o.query["status"] = status })
 }
 
-// WithType type获取 数据类型：0表示最新数据，1表示全天数据，2表示时间节点数据
-func (obj *_LineMgr) WithType(_type uint8) Option {
+// WithType type获取 数据类型：newest最新数据，node节点数据，day全天数据，logic逻辑数据
+func (obj *_LineMgr) WithType(_type string) Option {
 	return optionFunc(func(o *options) { o.query["type"] = _type })
 }
 
@@ -183,14 +183,14 @@ func (obj *_LineMgr) SelectPage(page IPage, opts ...Option) (resultPage IPage, e
 //////////////////////////enume case ////////////////////////////////////////////
 
 // GetFromID 通过id获取内容 主键
-func (obj *_LineMgr) GetFromID(id uint) (result Line, err error) {
+func (obj *_LineMgr) GetFromID(id int64) (result Line, err error) {
 	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`id` = ?", id).Find(&result).Error
 
 	return
 }
 
 // GetBatchFromID 批量查找 主键
-func (obj *_LineMgr) GetBatchFromID(ids []uint) (results []*Line, err error) {
+func (obj *_LineMgr) GetBatchFromID(ids []int64) (results []*Line, err error) {
 	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`id` IN (?)", ids).Find(&results).Error
 
 	return
@@ -225,28 +225,28 @@ func (obj *_LineMgr) GetBatchFromCost(costs []float64) (results []*Line, err err
 }
 
 // GetFromClick 通过click获取内容 点击数
-func (obj *_LineMgr) GetFromClick(click uint) (results []*Line, err error) {
+func (obj *_LineMgr) GetFromClick(click int64) (results []*Line, err error) {
 	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`click` = ?", click).Find(&results).Error
 
 	return
 }
 
 // GetBatchFromClick 批量查找 点击数
-func (obj *_LineMgr) GetBatchFromClick(clicks []uint) (results []*Line, err error) {
+func (obj *_LineMgr) GetBatchFromClick(clicks []int64) (results []*Line, err error) {
 	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`click` IN (?)", clicks).Find(&results).Error
 
 	return
 }
 
 // GetFromImp 通过imp获取内容 展现量
-func (obj *_LineMgr) GetFromImp(imp uint) (results []*Line, err error) {
+func (obj *_LineMgr) GetFromImp(imp int64) (results []*Line, err error) {
 	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`imp` = ?", imp).Find(&results).Error
 
 	return
 }
 
 // GetBatchFromImp 批量查找 展现量
-func (obj *_LineMgr) GetBatchFromImp(imps []uint) (results []*Line, err error) {
+func (obj *_LineMgr) GetBatchFromImp(imps []int64) (results []*Line, err error) {
 	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`imp` IN (?)", imps).Find(&results).Error
 
 	return
@@ -267,14 +267,14 @@ func (obj *_LineMgr) GetBatchFromCtr(ctrs []float64) (results []*Line, err error
 }
 
 // GetFromCv 通过cv获取内容 转化数
-func (obj *_LineMgr) GetFromCv(cv uint) (results []*Line, err error) {
+func (obj *_LineMgr) GetFromCv(cv int64) (results []*Line, err error) {
 	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`cv` = ?", cv).Find(&results).Error
 
 	return
 }
 
 // GetBatchFromCv 批量查找 转化数
-func (obj *_LineMgr) GetBatchFromCv(cvs []uint) (results []*Line, err error) {
+func (obj *_LineMgr) GetBatchFromCv(cvs []int64) (results []*Line, err error) {
 	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`cv` IN (?)", cvs).Find(&results).Error
 
 	return
@@ -309,28 +309,28 @@ func (obj *_LineMgr) GetBatchFromCpa(cpas []float64) (results []*Line, err error
 }
 
 // GetFromStatus 通过status获取内容 状态
-func (obj *_LineMgr) GetFromStatus(status uint8) (results []*Line, err error) {
+func (obj *_LineMgr) GetFromStatus(status bool) (results []*Line, err error) {
 	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`status` = ?", status).Find(&results).Error
 
 	return
 }
 
 // GetBatchFromStatus 批量查找 状态
-func (obj *_LineMgr) GetBatchFromStatus(statuss []uint8) (results []*Line, err error) {
+func (obj *_LineMgr) GetBatchFromStatus(statuss []bool) (results []*Line, err error) {
 	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`status` IN (?)", statuss).Find(&results).Error
 
 	return
 }
 
-// GetFromType 通过type获取内容 数据类型：0表示最新数据，1表示全天数据，2表示时间节点数据
-func (obj *_LineMgr) GetFromType(_type uint8) (results []*Line, err error) {
+// GetFromType 通过type获取内容 数据类型：newest最新数据，node节点数据，day全天数据，logic逻辑数据
+func (obj *_LineMgr) GetFromType(_type string) (results []*Line, err error) {
 	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`type` = ?", _type).Find(&results).Error
 
 	return
 }
 
-// GetBatchFromType 批量查找 数据类型：0表示最新数据，1表示全天数据，2表示时间节点数据
-func (obj *_LineMgr) GetBatchFromType(_types []uint8) (results []*Line, err error) {
+// GetBatchFromType 批量查找 数据类型：newest最新数据，node节点数据，day全天数据，logic逻辑数据
+func (obj *_LineMgr) GetBatchFromType(_types []string) (results []*Line, err error) {
 	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`type` IN (?)", _types).Find(&results).Error
 
 	return
@@ -395,8 +395,29 @@ func (obj *_LineMgr) GetBatchFromUpdateAt(updateAts []time.Time) (results []*Lin
 //////////////////////////primary index case ////////////////////////////////////////////
 
 // FetchByPrimaryKey primary or index 获取唯一内容
-func (obj *_LineMgr) FetchByPrimaryKey(id uint) (result Line, err error) {
+func (obj *_LineMgr) FetchByPrimaryKey(id int64) (result Line, err error) {
 	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`id` = ?", id).Find(&result).Error
+
+	return
+}
+
+// FetchIndexByIndex1  获取多个内容
+func (obj *_LineMgr) FetchIndexByIndex1(account string) (results []*Line, err error) {
+	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`account` = ?", account).Find(&results).Error
+
+	return
+}
+
+// FetchIndexByIndex2  获取多个内容
+func (obj *_LineMgr) FetchIndexByIndex2(_type string) (results []*Line, err error) {
+	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`type` = ?", _type).Find(&results).Error
+
+	return
+}
+
+// FetchIndexByIndex3  获取多个内容
+func (obj *_LineMgr) FetchIndexByIndex3(recordDate time.Time) (results []*Line, err error) {
+	err = obj.DB.WithContext(obj.ctx).Model(Line{}).Where("`record_date` = ?", recordDate).Find(&results).Error
 
 	return
 }

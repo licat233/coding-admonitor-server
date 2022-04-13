@@ -1,7 +1,7 @@
 package logx
 
 import (
-	"monitor-data/common/utils"
+	"admonitor-server/common/utils"
 	"path"
 
 	"go.uber.org/zap"

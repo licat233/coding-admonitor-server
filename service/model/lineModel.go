@@ -1,14 +1,14 @@
 package model
 
 import (
-	"monitor-data/common/global"
+	"admonitor-server/common/global"
 	"time"
 )
 
-const NEWEST = 0 //最新数据
-const NODE = 1   //节点数据
-const DAY = 2    //全天数据
-const LOGIC = 3  //逻辑数据
+const NEWEST = "newest" //最新数据
+const NODE = "node"     //节点数据
+const DAY = "day"       //全天数据
+const LOGIC = "logic"   //逻辑数据
 
 type LineModel struct {
 	*_LineMgr
@@ -32,13 +32,13 @@ func (m *LineModel) FindByDate(account string, date time.Time) (*Line, error) {
 	return line, result.Error
 }
 
-func (m *LineModel) FindByDateAndType(account string, date time.Time, Type int) (*Line, error) {
+func (m *LineModel) FindByDateAndType(account string, date time.Time, Type string) (*Line, error) {
 	line := new(Line)
 	result := m.DB.WithContext(m.ctx).Model(Line{}).Where("account = ? AND DATE(record_date) = ? AND type = ?", account, date.Local().Format("2006-01-02"), Type).First(line)
 	return line, result.Error
 }
 
-func (m *LineModel) FindsByDateAndType(account string, start, end time.Time, Type int) ([]Line, error) {
+func (m *LineModel) FindsByDateAndType(account string, start, end time.Time, Type string) ([]Line, error) {
 	var lines []Line
 	result := m.DB.WithContext(m.ctx).Model(Line{}).Where("account = ? AND  DATE(record_date) between ? AND ? AND type = ?", account, start.Local().Format("2006-01-02"), end.Local().Format("2006-01-02"), Type).Find(&lines)
 	return lines, result.Error
@@ -59,7 +59,7 @@ func (m *LineModel) InsertAll(lines []*Line) error {
 // 	return result.Error
 // }
 
-func (m *LineModel) UpdateByDateAndType(line *Line, date time.Time, Type int) error {
+func (m *LineModel) UpdateByDateAndType(line *Line, date time.Time, Type string) error {
 	account := line.Account
 	result := m.DB.WithContext(m.ctx).Model(Line{}).Omit("id", "create_at", "update_at").Where("account = ? AND DATE(record_date) = ? AND type = ?", account, date.Local().Format("2006-01-02"), Type).Save(line)
 	return result.Error
@@ -76,7 +76,7 @@ func (m *LineModel) DeleteById(id int64) error {
 	return result.Error
 }
 
-func (m *LineModel) DeleteByBetweenDate(account string, start, end time.Time, Type int) error {
+func (m *LineModel) DeleteByBetweenDate(account string, start, end time.Time, Type string) error {
 	line := new(Line)
 	result := m.DB.WithContext(m.ctx).Model(Line{}).Where("account = ? AND DATE(record_date) between ? AND ? AND type = ?", account, start.Local().Format("2006-01-02"), end.Local().Format("2006-01-02"), Type).Delete(line)
 	return result.Error

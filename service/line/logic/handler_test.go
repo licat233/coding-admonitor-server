@@ -1,9 +1,9 @@
 package logic
 
 import (
+	"admonitor-server/config"
 	"errors"
 	"fmt"
-	"monitor-data/config"
 	"testing"
 )
 

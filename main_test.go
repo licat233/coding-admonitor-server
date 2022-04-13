@@ -1,9 +1,9 @@
 package main
 
 import (
-	"monitor-data/common/utils"
-	"monitor-data/config"
-	"monitor-data/service/line/logic"
+	"admonitor-server/common/utils"
+	"admonitor-server/config"
+	"admonitor-server/service/line/logic"
 	"testing"
 )
 

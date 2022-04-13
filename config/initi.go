@@ -1,10 +1,10 @@
 package config
 
 import (
-	"monitor-data/common/global"
-	"monitor-data/common/gromx"
-	"monitor-data/common/logx"
-	"monitor-data/common/timer"
+	"admonitor-server/common/global"
+	"admonitor-server/common/gromx"
+	"admonitor-server/common/logx"
+	"admonitor-server/common/timer"
 )
 
 func Initialize() {

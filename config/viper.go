@@ -1,8 +1,8 @@
 package config
 
 import (
+	"admonitor-server/common/utils"
 	"fmt"
-	"monitor-data/common/utils"
 	"path"
 
 	"github.com/spf13/viper"

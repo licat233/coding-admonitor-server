@@ -13,7 +13,7 @@ import (
 //获取当前项目地址
 func CurrentProjectRootPath() string {
 	fullPath := getCurrentAbPath()
-	reg := regexp.MustCompile("^.*monitor-data")
+	reg := regexp.MustCompile("^.*admonitor")
 	matched := reg.FindString(fullPath)
 	return matched
 }
