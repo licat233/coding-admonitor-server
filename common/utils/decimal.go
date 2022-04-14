@@ -38,3 +38,20 @@ func CostCalculation(newCost, oldCost float64) float64 {
 	cost, _ := newCosts.Sub(oldCosts).Round(2).Float64()
 	return cost
 }
+
+func StringToFloat64(str string) float64 {
+	if str == "" {
+		return 0
+	}
+	d, _ := decimal.NewFromString(str)
+	f, _ := d.Float64()
+	return f
+}
+
+func StringToInt64(str string) int64 {
+	if str == "" {
+		return 0
+	}
+	d, _ := decimal.NewFromString(str)
+	return d.IntPart()
+}

@@ -1,4 +1,4 @@
-package logic
+package internal
 
 import (
 	"admonitor-server/common/errorx"
@@ -8,53 +8,53 @@ import (
 	"fmt"
 )
 
-type LineLogic struct {
-	Model  *model.LineModel
-	Spider *Spider
-}
-
-/** NewLine 新建line
+/** NewPopin 新建line
  */
-func NewLineLogic() *LineLogic {
-	return &LineLogic{
-		Model:  model.NewLineModel(),
+func NewPopinLogic() *PopinLogic {
+	return &PopinLogic{
+		Model:  model.NewPopinModel(),
 		Spider: NewSpider(),
 	}
 }
 
 //InsertNewestData 插入今天最新的数据到数据库
-func (l *LineLogic) InsertNewestData() {
+func (l *PopinLogic) InsertNewestData() {
 	l.safeRun(func() {
-		l.createLineData(model.NEWEST, true)
+		l.createPopinData(model.NEWEST, true)
 	})
 }
 
 //InsertNodeData 插入今天节点数据到数据库
-func (l *LineLogic) InsertNodeData() {
+func (l *PopinLogic) InsertNodeData() {
 	l.safeRun(func() {
-		l.createLineData(model.NODE, true)
+		l.createPopinData(model.NODE, true)
 	})
 }
 
 //InsertDayData 插入昨天的全天数据到数据库
-func (l *LineLogic) InsertDayData() {
+func (l *PopinLogic) InsertDayData() {
 	l.safeRun(func() {
-		l.createLineData(model.DAY, true)
+		l.createPopinData(model.DAY, true)
 	})
 }
 
 //InsertYesterdayLogicData 插入昨天的逻辑数据到数据库
-func (l *LineLogic) InsertYesterdayLogicData() {
-	l.safeRun(l.insertYestdayLogicLineData)
+func (l *PopinLogic) InsertYesterdayLogicData() {
+	l.safeRun(l.insertYestdayLogicPopinData)
 }
 
 //UpdateCurrentLogicData 更新当前的逻辑数据到数据库
-func (l *LineLogic) UpdateCurrentLogicData() {
-	l.safeRun(l.updateCurrentLogicLineData)
+func (l *PopinLogic) UpdateCurrentLogicData() {
+	l.safeRun(l.updateCurrentLogicPopinData)
+}
+
+//popin心跳
+func (l *PopinLogic) HeartbeatRun() {
+	l.safeRun(l.Spider.Heartbeat)
 }
 
 //safeRun 截断器
-func (l *LineLogic) safeRun(fn func()) {
+func (l *PopinLogic) safeRun(fn func()) {
 	defer func() {
 		err := recover()
 		if err != nil {

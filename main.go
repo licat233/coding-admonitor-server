@@ -1,13 +1,12 @@
 package main
 
 import (
-	"admonitor-server/common/utils"
-	"admonitor-server/config"
+	"admonitor-server/common/config"
 	"admonitor-server/service/line"
+	"admonitor-server/service/popin"
 )
 
 func init() {
-	utils.InitTime()
 	config.Initialize()
 }
 
@@ -18,4 +17,6 @@ func main() {
 func Server() {
 	lineServer := line.NewLineServer()
 	lineServer.Start()
+	popinServer := popin.NewPopinServer()
+	popinServer.Start()
 }

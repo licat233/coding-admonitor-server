@@ -1,4 +1,4 @@
-package logic
+package internal
 
 type RespData struct {
 	Datas  []AccountCostData `json:"datas"`
@@ -49,8 +49,10 @@ type Statistics struct {
 	CurrencySymbol string  `json:"currencySymbol"`
 }
 
+//AccountConfig 账户信息
 type AccountConfig struct {
-	Account  string `json:"account"`
-	Nickname string `json:"nickname"`
-	Status   bool   `json:"status"`
+	AccountID   string `json:"accountId"`
+	AccountName string `json:"accountName"`
+	Nickname    string `json:"nickname"`
+	Status      bool   `json:"status"`
 }

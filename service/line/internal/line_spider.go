@@ -1,4 +1,4 @@
-package logic
+package internal
 
 import (
 	"admonitor-server/common/errorx"
@@ -105,5 +105,6 @@ func headerHandler(headers *http.Header) {
 	headers.Add("Sec-Fetch-Dest", "empty")
 	headers.Add("Sec-Fetch-Mode", "cors")
 	headers.Add("Sec-Fetch-Site", "same-origin")
+	headers.Add("User-Agent", ua())
 	headers.Add("sentry-trace", "3e630a83fc154dcb8603694c5f14dabd-88912279c7b81e26-0")
 }

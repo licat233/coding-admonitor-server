@@ -1,4 +1,4 @@
-package logic
+package internal
 
 import (
 	"admonitor-server/common/errorx"
@@ -16,6 +16,34 @@ import (
 
 //spiderLineData 爬取line数据
 func (l *LineLogic) spiderLineData(date time.Time, Type string) (lines []*model.Line) {
+	if Type == model.NODE {
+		//规定只能在 09:00 - 10:00 时间段抓取
+		if !utils.IsOn09to10(time.Now().Local()) {
+			//如果不在09:00-10:00时间段，则不抓取，全部赋 0
+			var nodeDate = utils.NowNodeDate()
+			var accounts []*AccountConfig = AccountList() //由yaml文件提供
+			for _, account := range accounts {
+				if account.Status != true {
+					continue
+				}
+				lines = append(lines, &model.Line{
+					Account:    account.AccountID,
+					Cost:       0,
+					Click:      0,
+					Imp:        0,
+					Ctr:        0,
+					Cv:         0,
+					Cvr:        0,
+					Cpa:        0,
+					Status:     false,
+					Type:       Type,
+					Currency:   "TWD",
+					RecordDate: nodeDate,
+				})
+			}
+			return
+		}
+	}
 	respData := l.Spider.Do(date)
 	if respData == nil {
 		global.LOG.Error(errorx.New("data为nil", errors.New("Spider获取line广告数据失败")))
@@ -28,14 +56,14 @@ func (l *LineLogic) spiderLineData(date time.Time, Type string) (lines []*model.
 			continue
 		}
 		for _, data := range datas {
-			if data.Id == account.Account {
+			if data.Id == account.AccountID {
 				statistic := &data.Statistics
 				var status bool
 				if data.DeliveryStatus == "ACTIVE" {
 					status = true
 				}
 				line := &model.Line{
-					Account:    account.Account,
+					Account:    account.AccountID,
 					Cost:       statistic.Cost,
 					Click:      statistic.Click,
 					Imp:        statistic.Imp,
@@ -69,20 +97,20 @@ func (l *LineLogic) createLineData(Type string, replace bool) {
 	if Type == model.DAY {
 		date = date.AddDate(0, 0, -1)
 	}
-	lineDatas := l.spiderLineData(date, Type)
-	for _, lineData := range lineDatas {
-		l.InsertLineData(lineData, date, Type, replace)
+	lineRecords := l.spiderLineData(date, Type)
+	for _, lineRecord := range lineRecords {
+		l.InsertLineData(lineRecord, date, Type, replace)
 	}
 	return
 }
 
 //ReplaceData 插入数据到数据库，根据replace判断是否替换
-func (l *LineLogic) InsertLineData(lineData *model.Line, date time.Time, Type string, replace bool) {
-	if lineData == nil {
-		global.LOG.Error("插入的lineData数据为空")
+func (l *LineLogic) InsertLineData(lineRecord *model.Line, date time.Time, Type string, replace bool) {
+	if lineRecord == nil {
+		global.LOG.Error("插入的lineRecord数据为空")
 		return
 	}
-	res, err := l.Model.FindByDateAndType(lineData.Account, date, Type)
+	res, err := l.Model.FindByDateAndType(lineRecord.Account, date, Type)
 	if err != nil && err != gorm.ErrRecordNotFound {
 		global.LOG.Error(errorx.New("GORM查询错误", err))
 		return
@@ -91,14 +119,14 @@ func (l *LineLogic) InsertLineData(lineData *model.Line, date time.Time, Type st
 		return
 	}
 	if err == gorm.ErrRecordNotFound { //不存在，则插入
-		if err = l.Model.InsertOne(lineData); err != nil {
+		if err = l.Model.InsertOne(lineRecord); err != nil {
 			global.LOG.Error(errorx.New("GORM插入数据失败", err))
 			return
 		}
 	} else {
 		//已存在，则更新
-		lineData.ID = res.ID
-		if err = l.Model.UpdateByDateAndType(lineData, date, Type); err != nil {
+		lineRecord.ID = res.ID
+		if err = l.Model.UpdateByDateAndType(lineRecord, date, Type); err != nil {
 			global.LOG.Error(errorx.New("GORM更新数据失败", err))
 			return
 		}
@@ -118,20 +146,20 @@ func (l *LineLogic) insertYestdayLogicLineData() {
 			l.createLineData(model.DAY, true)
 		}
 		yesterday := now.AddDate(0, 0, -1)
-		logicLine, err := l.LogicLineDataByDate(info.Account, yesterday)
+		logicLine, err := l.LogicLineDataByDate(info.AccountID, yesterday)
 		if err != nil {
-			global.LOG.Error(errorx.New("获取昨天的logic数据失败", err))
+			global.LOG.Error(errorx.New("获取昨天的line_logic数据失败", err))
 			continue
 		}
 		if logicLine == nil {
-			global.LOG.Error(errorx.New("创建昨天的logic数据失败", errors.New("logicLine为nil")))
+			global.LOG.Error(errorx.New("创建昨天的line_logic数据失败", errors.New("logicLine为nil")))
 			continue
 		}
 		l.InsertLineData(logicLine, yesterday, model.LOGIC, true)
 	}
 }
 
-//updateCurrentLogicLineData 更新当前active的账户的logic数据到数据库
+//updateCurrentLogicLineData 更新当前active的账户的line_logic数据到数据库
 func (l *LineLogic) updateCurrentLogicLineData() {
 	date := utils.NowLogicDate()
 	lists := AccountList()
@@ -139,13 +167,13 @@ func (l *LineLogic) updateCurrentLogicLineData() {
 		if info.Status != true {
 			continue
 		}
-		logicLine, err := l.currentLogicLineData(info.Account)
+		logicLine, err := l.currentLogicLineData(info.AccountID)
 		if err != nil {
-			global.LOG.Error(errorx.New("获取当前logic数据失败", err))
+			global.LOG.Error(errorx.New("获取当前line_logic数据失败", err))
 			continue
 		}
 		if logicLine == nil {
-			global.LOG.Error(errorx.New("更新当前logic数据失败", errors.New("logicLine为nil")))
+			global.LOG.Error(errorx.New("更新当前line_logic数据失败", errors.New("logicLine为nil")))
 			continue
 		}
 		l.InsertLineData(logicLine, date, model.LOGIC, true)
@@ -215,7 +243,7 @@ func (l *LineLogic) currentLogicLineData(account string) (*model.Line, error) {
 	//获取当前最新消耗
 	newestLine, err := l.Model.FindByDateAndType(account, now, model.NEWEST)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, fmt.Errorf("数据库缺失%s的最新数据", now.Format("2006-01-02"))
+		return nil, fmt.Errorf("数据库缺失%s的最新line数据", now.Format("2006-01-02"))
 	}
 	if err != nil {
 		global.LOG.Error(errorx.New("GORM查询错误", err))
@@ -225,7 +253,7 @@ func (l *LineLogic) currentLogicLineData(account string) (*model.Line, error) {
 	//获取logicDate的节点消耗
 	nodeLine, err := l.Model.FindByDateAndType(account, logicDate, model.NODE)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		//如果没有logicDate的节点数据，那就用logicDate最新的数据，作为logic数据返回
+		//如果没有logicDate的节点数据，那就用logicDate最新的数据，作为line_logic数据返回
 		newestLine.Type = model.LOGIC
 		return newestLine, nil
 		// return nil, fmt.Errorf("数据库缺失%s的节点数据", logicDate.Format("2006-01-02"))
@@ -307,7 +335,7 @@ func (l *LineLogic) LogicLineDataByDate(account string, date time.Time) (*model.
 	return l.CalculateOnNodeBefore(dayLine, nodeLine, nodeLineAft), nil
 }
 
-/** CalculateOnNodeBefore 计算节点前的logic数据 = 昨日全天消耗 - 昨日节点消耗 + (今天最新消耗||节点消耗)
+/** CalculateOnNodeBefore 计算节点前的line_logic数据 = 昨日全天消耗 - 昨日节点消耗 + (今天最新消耗||节点消耗)
  * @param: yerDayLine type *model.Line 前一天的全天数据
  * @param: yerNodeLine type *model.Line 前一天的节点数据
  * @param: nodeLine type *model.Line 今天最新消耗或者节点消耗
@@ -339,9 +367,9 @@ func (l *LineLogic) CalculateOnNodeBefore(yerDayLine, yerNodeLine, nodeLine *mod
 	}
 }
 
-/** CalculateOnNodeAfter 计算节点后的logic数据 = 今日最新消耗 - 今日节点消耗
+/** CalculateOnNodeAfter 计算节点后的line_logic数据 = 今日最新消耗 - 今日节点消耗
  * @param: nodeLine type *model.Line 当天的节点数据
- * @param: newestLine type *model.Line 当前的最新数据
+ * @param: newestLine type *model.Line 当前的最新line数据
  */
 func (l *LineLogic) CalculateOnNodeAfter(newestLine, nodeLine *model.Line) *model.Line {
 	cost, ok := decimal.NewFromFloat(newestLine.Cost).Sub(decimal.NewFromFloat(nodeLine.Cost)).Round(2).Float64()
@@ -381,13 +409,15 @@ func AccountList() (res []*AccountConfig) {
 		return
 	}
 	for i := 0; i < n; i++ {
-		account := viper.GetString(fmt.Sprintf("line.account-list.%d.account", i))
+		accountId := viper.GetString(fmt.Sprintf("line.account-list.%d.accountId", i))
+		accountName := viper.GetString(fmt.Sprintf("line.account-list.%d.accountName", i))
 		nickname := viper.GetString(fmt.Sprintf("line.account-list.%d.nickname", i))
 		status := viper.GetBool(fmt.Sprintf("line.account-list.%d.status", i))
 		res = append(res, &AccountConfig{
-			Account:  account,
-			Nickname: nickname,
-			Status:   status,
+			AccountID:   accountId,
+			AccountName: accountName,
+			Nickname:    nickname,
+			Status:      status,
 		})
 	}
 	return

@@ -6,6 +6,14 @@ import (
 
 var LOC, _ = time.LoadLocation("Asia/Shanghai")
 
+//IsOn09to10 判断是否在09：00-10：00之间
+func IsOn09to10(date time.Time) bool {
+	if date.Before(TargetTime(date, "09:00:00")) || date.After(TargetTime(date, "10:00:00")) {
+		return false
+	}
+	return true
+}
+
 //Get0930 获取某天09:30的时间
 func Get0930(date time.Time) time.Time {
 	dateDay := date.Format("2006-01-02")
@@ -14,6 +22,7 @@ func Get0930(date time.Time) time.Time {
 }
 
 //TargetTime 获取指定时间节点的时间
+//例子： TargetTime(time.Now(), "15:00:00")
 func TargetTime(date time.Time, ts string) time.Time {
 	t, _ := time.ParseInLocation("2006-01-02 15:04:05", date.Format("2006-01-02")+" "+ts, LOC)
 	return t
@@ -40,6 +49,17 @@ func NowLogicDate() time.Time {
 	}
 	//小于09:30,返回昨天日期
 	return BeforeDate(now)
+}
+
+//NowLogicDate 当前的广告数据统计的节点时间：09:30-09:30为一天
+func NowNodeDate() time.Time {
+	now := time.Now().Local()
+	if now.After(Get0930(now)) {
+		//大于09:30，返回今天日期
+		return Get0930(now)
+	}
+	//小于09:30,返回昨天日期
+	return Get0930(BeforeDate(now))
 }
 
 //GetInsertDate 获取应该生成的时间日期,逻辑日期以这个函数为准

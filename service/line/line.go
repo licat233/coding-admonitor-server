@@ -3,24 +3,33 @@ package line
 import (
 	"admonitor-server/common/global"
 	"admonitor-server/common/timer"
-	"admonitor-server/service/line/logic"
+	"admonitor-server/service/line/internal"
 	"fmt"
 )
 
 type LineServer struct {
-	LineLogic *logic.LineLogic
+	LineLogic *internal.LineLogic
 	Timer     timer.Timer
 }
 
 func NewLineServer() *LineServer {
 	return &LineServer{
-		LineLogic: logic.NewLineLogic(),
+		LineLogic: internal.NewLineLogic(),
 		Timer:     timer.NewTimerTask(),
 	}
 }
 
 func (a *LineServer) Start() {
 	// defer recovery.RecoverHandler()
+	global.LOG.Info("LineServer启动中...")
+	fmt.Println("LineServer启动中...")
+	//先运行一次，检查是否正常
+	if !a.Once() {
+		msg := "因为Spider已关闭，LineServer启动失败"
+		global.LOG.Info(msg)
+		fmt.Println(msg)
+		return
+	}
 	//添加任务
 	//每隔2分钟获取一次最新line数据
 	a.Timer.AddTaskByFunc("LineNewestData", "0 */2 * * * *", a.LineLogic.InsertNewestData)
@@ -41,23 +50,37 @@ func (a *LineServer) Start() {
 	a.Timer.StartTask("LineNodeData")
 	a.Timer.StartTask("YesterdayLineLogicData")
 	//提示
+	global.LOG.Info("LineServer已启动")
 	fmt.Println("LineServer已启动")
 }
 
 func (a *LineServer) Stop() {
 	a.Timer.Close()
+	global.LOG.Info("LineServer已停止")
 	fmt.Println("LineServer已停止")
 }
 
 func (a *LineServer) Restart() {
+	global.LOG.Info("LineServer重启中...")
+	fmt.Println("LineServer重启中...")
 	a.Stop()
 	a.Start()
+	global.LOG.Info("LineServer已重启")
 	fmt.Println("LineServer已重启")
+}
+
+func (a *LineServer) Once() bool {
+	a.LineLogic.InsertDayData()
+	a.LineLogic.InsertNewestData()
+	a.LineLogic.UpdateCurrentLogicData()
+	a.LineLogic.InsertNodeData()
+	a.LineLogic.InsertYesterdayLogicData()
+	return !a.LineLogic.Spider.Close
 }
 
 func (a *LineServer) monitorLineServer() {
 	if a.LineLogic.Spider.Close {
 		a.Stop()
-		global.LOG.Info("因为Spider已关闭，LineServer已经停止运行")
+		global.LOG.Info("Spider出现错误，LineServer已经停止运行")
 	}
 }

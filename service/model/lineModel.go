@@ -5,11 +5,6 @@ import (
 	"time"
 )
 
-const NEWEST = "newest" //最新数据
-const NODE = "node"     //节点数据
-const DAY = "day"       //全天数据
-const LOGIC = "logic"   //逻辑数据
-
 type LineModel struct {
 	*_LineMgr
 }
