@@ -1,24 +1,17 @@
 package internal
 
 import (
-	"admonitor-server/common/errorx"
-	"admonitor-server/common/global"
+	"admonitor-server/service/line/internal/spider"
 	"admonitor-server/service/model"
 	"errors"
-	"fmt"
 )
 
-type LineLogic struct {
-	Model  *model.LineModel
-	Spider *Spider
-}
-
-/** NewLine 新建line
+/** NewLine 新建lineLogic
  */
 func NewLineLogic() *LineLogic {
 	return &LineLogic{
 		Model:  model.NewLineModel(),
-		Spider: NewSpider(),
+		Spider: spider.NewSpider(),
 	}
 }
 
@@ -53,18 +46,8 @@ func (l *LineLogic) UpdateCurrentLogicData() {
 	l.safeRun(l.updateCurrentLogicLineData)
 }
 
-//safeRun 截断器
+//safeRun 截断器，这里的panic由LineServer恢复
 func (l *LineLogic) safeRun(fn func()) {
-	defer func() {
-		err := recover()
-		if err != nil {
-			if v, ok := err.(error); ok {
-				global.LOG.Error(errorx.New("已经暂停服务", v))
-			} else {
-				fmt.Println(err)
-			}
-		}
-	}()
 	if l.Spider.Close {
 		panic(errors.New("spider已关闭"))
 	}

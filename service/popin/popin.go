@@ -1,10 +1,12 @@
 package popin
 
 import (
+	"admonitor-server/common/errorx"
 	"admonitor-server/common/global"
 	"admonitor-server/common/timer"
 	"admonitor-server/service/popin/internal"
 	"fmt"
+	"sync"
 )
 
 type PopinServer struct {
@@ -19,6 +21,37 @@ func NewPopinServer() *PopinServer {
 	}
 }
 
+//Run 服务启动程序
+func Run() {
+	var stop = make(chan bool)
+	var wg sync.WaitGroup
+	defer func() {
+		err := recover()
+		if err != nil {
+			if v, ok := err.(error); ok {
+				global.LOG.Error(errorx.New("已经停止PopinServer服务", v))
+				fmt.Println(v.Error())
+			} else {
+				fmt.Println(err)
+			}
+			stop <- true
+		}
+	}()
+	popinServer := NewPopinServer()
+	popinServer.Start()
+	//保持程序后台运行
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		select {
+		case <-stop:
+			fmt.Println("PopinServer-Run程序结束运行")
+		}
+	}()
+
+	wg.Wait()
+}
+
 func (a *PopinServer) Start() {
 	global.LOG.Info("PopinServer启动中...")
 	fmt.Println("PopinServer启动中...")
@@ -30,27 +63,21 @@ func (a *PopinServer) Start() {
 		fmt.Println(msg)
 		return
 	}
-	//添加任务
+	//添加任务，cron v3版本默认不支持秒级定时，spec只能有 5 个field，分、时、天、月、星期几
 	//每隔2分钟获取一次最新popin数据
-	a.Timer.AddTaskByFunc("PopinNewestData", "0 */2 * * * *", a.PopinLogic.InsertNewestData)
+	a.Timer.AddTaskByFunc("PopinNewestData", "*/2 * * * *", a.PopinLogic.InsertNewestData)
 	//每隔2分钟30秒更新逻辑数据到数据库
-	a.Timer.AddTaskByFunc("CurrentPopinLogicData", "0 */2 * * * *", a.PopinLogic.UpdateCurrentLogicData)
+	a.Timer.AddTaskByFunc("CurrentPopinLogicData", "*/2 * * * *", a.PopinLogic.UpdateCurrentLogicData)
 	//每天凌晨 00:02，获取昨日popin数据
-	a.Timer.AddTaskByFunc("PopinDayData", "0 2 0 * * *", a.PopinLogic.InsertDayData)
-	//每天早上 9:30:30，获取该时间节点popin数据
-	a.Timer.AddTaskByFunc("PopinNodeData", "30 30 9 * * *", a.PopinLogic.InsertNodeData)
+	a.Timer.AddTaskByFunc("PopinDayData", "2 0 * * *", a.PopinLogic.InsertDayData)
+	//每天早上 9:30，获取该时间节点popin数据
+	a.Timer.AddTaskByFunc("PopinNodeData", "30 9 * * *", a.PopinLogic.InsertNodeData)
 	//每天早上 9:32，新建昨日的逻辑popin消耗数据
-	a.Timer.AddTaskByFunc("YesterdayPopinLogicData", "0 32 9 * * *", a.PopinLogic.InsertYesterdayLogicData)
-	//每隔 5 分钟心跳一次
-	a.Timer.AddTaskByFunc("YesterdayPopinLogicData", "0 */5 * * * *", a.PopinLogic.HeartbeatRun)
-	//服务巡逻监控
+	a.Timer.AddTaskByFunc("YesterdayPopinLogicData", "32 9 * * *", a.PopinLogic.InsertYesterdayLogicData)
+	//每隔 5 分钟心跳一次，更新cookie
+	a.Timer.AddTaskByFunc("YesterdayPopinLogicData", "*/5 * * * *", a.PopinLogic.HeartbeatRun)
+	//服务巡逻监控，如果spider已经关闭，则结束所有任务
 	a.Timer.AddTaskByFunc("PopinNewestData", "0 */1 * * * *", a.monitorPopinServer)
-	//开始任务
-	a.Timer.StartTask("PopinNewestData")
-	a.Timer.StartTask("CurrentPopinLogicData")
-	a.Timer.StartTask("PopinDayData")
-	a.Timer.StartTask("PopinNodeData")
-	a.Timer.StartTask("YesterdayPopinLogicData")
 	//提示
 	global.LOG.Info("PopinServer已启动")
 	fmt.Println("PopinServer已启动")

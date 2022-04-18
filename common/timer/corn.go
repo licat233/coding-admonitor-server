@@ -15,12 +15,17 @@ type Timer interface {
 	Remove(taskName string, id int)
 	Clear(taskName string)
 	Close()
+	Start()
 }
 
 // timer 定时任务管理
 type timer struct {
 	taskList map[string]*cron.Cron
 	sync.Mutex
+}
+
+func NewTimerTask() Timer {
+	return &timer{taskList: make(map[string]*cron.Cron)}
 }
 
 // AddTaskByFunc 通过函数的方法添加任务
@@ -104,6 +109,12 @@ func (t *timer) Close() {
 	}
 }
 
-func NewTimerTask() Timer {
-	return &timer{taskList: make(map[string]*cron.Cron)}
+//Start 开始全部任务
+func (t *timer) Start() {
+	t.Lock()
+	defer t.Unlock()
+	for _, v := range t.taskList {
+		v.Start()
+	}
+	return
 }

@@ -1,8 +1,18 @@
+/*
+ * @Author: licat
+ * @Date: 2022-04-16 14:21:57
+ * @LastEditors: licat
+ * @LastEditTime: 2022-04-16 16:10:25
+ * @Description: popin表model
+ */
 package model
 
 import (
 	"admonitor-server/common/global"
+	"errors"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type PopinModel struct {
@@ -18,18 +28,29 @@ func NewPopinModel() *PopinModel {
 func (m *PopinModel) FindOne(id int64) (*Popin, error) {
 	line := new(Popin)
 	result := m.DB.WithContext(m.ctx).Model(Popin{}).First(line, id)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, result.Error
+	}
 	return line, result.Error
 }
 
+/** FindByDate
+ */
 func (m *PopinModel) FindByDate(account string, date time.Time) (*Popin, error) {
 	line := new(Popin)
 	result := m.DB.WithContext(m.ctx).Model(Popin{}).Where("account = ? AND DATE(record_date) = ?", account, date.Local().Format("2006-01-02")).First(line)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, result.Error
+	}
 	return line, result.Error
 }
 
 func (m *PopinModel) FindByDateAndType(account string, date time.Time, Type string) (*Popin, error) {
 	line := new(Popin)
 	result := m.DB.WithContext(m.ctx).Model(Popin{}).Where("account = ? AND DATE(record_date) = ? AND type = ?", account, date.Local().Format("2006-01-02"), Type).First(line)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, result.Error
+	}
 	return line, result.Error
 }
 

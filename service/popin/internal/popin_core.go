@@ -1,11 +1,9 @@
 package internal
 
 import (
-	"admonitor-server/common/errorx"
-	"admonitor-server/common/global"
 	"admonitor-server/service/model"
+	"admonitor-server/service/popin/internal/spider"
 	"errors"
-	"fmt"
 )
 
 /** NewPopin 新建line
@@ -13,7 +11,7 @@ import (
 func NewPopinLogic() *PopinLogic {
 	return &PopinLogic{
 		Model:  model.NewPopinModel(),
-		Spider: NewSpider(),
+		Spider: spider.NewSpider(),
 	}
 }
 
@@ -53,18 +51,8 @@ func (l *PopinLogic) HeartbeatRun() {
 	l.safeRun(l.Spider.Heartbeat)
 }
 
-//safeRun 截断器
+//safeRun 截断器，这里的panic由PopinServer恢复
 func (l *PopinLogic) safeRun(fn func()) {
-	defer func() {
-		err := recover()
-		if err != nil {
-			if v, ok := err.(error); ok {
-				global.LOG.Error(errorx.New("已经暂停服务", v))
-			} else {
-				fmt.Println(err)
-			}
-		}
-	}()
 	if l.Spider.Close {
 		panic(errors.New("spider已关闭"))
 	}

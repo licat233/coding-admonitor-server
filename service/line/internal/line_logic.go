@@ -4,6 +4,7 @@ import (
 	"admonitor-server/common/errorx"
 	"admonitor-server/common/global"
 	"admonitor-server/common/utils"
+	"admonitor-server/service/line/internal/spider"
 	"admonitor-server/service/model"
 	"errors"
 	"fmt"
@@ -13,6 +14,19 @@ import (
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
+
+type LineLogic struct {
+	Model  *model.LineModel
+	Spider *spider.Spider
+}
+
+//AccountConfig 账户信息
+type AccountConfig struct {
+	AccountID   string
+	AccountName string
+	Nickname    string
+	Status      bool
+}
 
 //spiderLineData 爬取line数据
 func (l *LineLogic) spiderLineData(date time.Time, Type string) (lines []*model.Line) {
@@ -44,7 +58,7 @@ func (l *LineLogic) spiderLineData(date time.Time, Type string) (lines []*model.
 			return
 		}
 	}
-	respData := l.Spider.Do(date)
+	respData := l.Spider.Statistics(date)
 	if respData == nil {
 		global.LOG.Error(errorx.New("data为nil", errors.New("Spider获取line广告数据失败")))
 		return
@@ -409,8 +423,8 @@ func AccountList() (res []*AccountConfig) {
 		return
 	}
 	for i := 0; i < n; i++ {
-		accountId := viper.GetString(fmt.Sprintf("line.account-list.%d.accountId", i))
-		accountName := viper.GetString(fmt.Sprintf("line.account-list.%d.accountName", i))
+		accountId := viper.GetString(fmt.Sprintf("line.account-list.%d.id", i))
+		accountName := viper.GetString(fmt.Sprintf("line.account-list.%d.name", i))
 		nickname := viper.GetString(fmt.Sprintf("line.account-list.%d.nickname", i))
 		status := viper.GetBool(fmt.Sprintf("line.account-list.%d.status", i))
 		res = append(res, &AccountConfig{

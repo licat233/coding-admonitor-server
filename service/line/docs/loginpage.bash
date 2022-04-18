@@ -1,0 +1,16 @@
+curl 'https://account.line.biz/login' \
+  -H 'Connection: keep-alive' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'DNT: 1' \
+  -H 'Upgrade-Insecure-Requests: 1' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36' \
+  -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9' \
+  -H 'Sec-Fetch-Site: none' \
+  -H 'Sec-Fetch-Mode: navigate' \
+  -H 'Sec-Fetch-User: ?1' \
+  -H 'Sec-Fetch-Dest: document' \
+  -H 'Accept-Language: zh-CN,zh;q=0.9' \
+  -H 'Cookie: _trmccid=070301dbe3bbdc42; _ga=GA1.2.103725351.1650101639; _gid=GA1.2.1632418583.1650101639; _mkto_trk=id:872-KNP-101&token:_mch-line.biz-1650101639244-52133; trd_cid=16501016412721031; trd_vid_l=2306%3A16501016412721031; trd_vuid_l=7205495653349450649; trd_first_visit=1650101642; trd_sid=16501016418958338; XSRF-TOKEN=13c3e992-7073-4d7c-9c8b-37e26abfeb21; SESSION=NDFkZGVmNDQtNjQwOS00ZDA2LWE4ODItNDMyM2E4MDc2MmNi; _trmcdisabled2=-1; _trmcuser={"id":""}; _trmcsession={"id":"d3046e150f04fe0f","path":"/login","query":"?redirectUri=https%3A%2F%2Fadmanager.line.biz%2Flogin%2F&scope=email","params":{},"time":1650101642559}; _trmcpage=/login; trd_pw=2; trd_pws=2; __try__=1650101739210' \
+  --compressed

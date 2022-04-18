@@ -1,6 +1,6 @@
-package internal
+package spider
 
-type RespData struct {
+type StatisticsResp struct {
 	Datas  []AccountCostData `json:"datas"`
 	Paging struct {
 		Page          int64    `json:"page"`
@@ -47,12 +47,4 @@ type Statistics struct {
 	Cost           float64 `json:"cost"`
 	Currency       string  `json:"currency"`
 	CurrencySymbol string  `json:"currencySymbol"`
-}
-
-//AccountConfig 账户信息
-type AccountConfig struct {
-	AccountID   string `json:"accountId"`
-	AccountName string `json:"accountName"`
-	Nickname    string `json:"nickname"`
-	Status      bool   `json:"status"`
 }

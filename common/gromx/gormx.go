@@ -34,13 +34,13 @@ func NewGromDB() *gorm.DB {
 	}
 	// defer mySQL.Close()
 	//设置最大空闲连接
-	num := viper.GetInt("mysql.maxIdleConns")
+	num := viper.GetInt("mysql.max-idle-conns")
 	if num == 0 {
 		num = 10
 	}
 	mySQL.SetMaxIdleConns(num)
 	//设置最大连接数
-	num2 := viper.GetInt("mysql.maxOpenConns")
+	num2 := viper.GetInt("mysql.max-open-conns")
 	if num2 == 0 {
 		num2 = 100
 	}

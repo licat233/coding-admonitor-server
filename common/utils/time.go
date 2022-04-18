@@ -96,6 +96,8 @@ func GetlastDate() string {
 	return yesterday
 }
 
+/** InitTime 初始化时区
+ */
 func InitTime() {
 	var cstZone = time.FixedZone("CST", 8*3600)
 	time.Local = cstZone

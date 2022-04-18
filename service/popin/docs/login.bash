@@ -1,0 +1,11 @@
+curl 'https://ads.popin.cc/platform/api/campaignManager/login' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"' \
+  -H 'DNT: 1' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36' \
+  -H 'Content-Type: application/json; charset=UTF-8' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'Referer: https://ads.popin.cc/platform/user/login' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  --data-raw '{"email":"licat233@gmail.com","password":"205D7E435CD6230A13279F251ED4B3C4"}' \
+  --compressed

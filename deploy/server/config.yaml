@@ -1,3 +1,4 @@
+#切勿使用驼峰法命名键值
 model: dev #当前模式 dev || pro
 mysql:
   addr: localhost:3306
@@ -5,42 +6,47 @@ mysql:
   password: imih7kNDasGJ6dFP
   db: admonitor
   params: charset=utf8mb4&parseTime=True&loc=Local
-  maxIdleConns: 10 #设置最大空闲连接
-  maxOpenConns: 100 #设置最大连接数
+  max-idle-conns: 10 #设置最大空闲连接
+  max-open-conns: 100 #设置最大连接数
   log-level: error #日志级别
 redis:
   addr: 127.0.0.1:6379
   pass: ""
+  db: 1
 line:
-  cookie: "_ga=GA1.2.1836409966.1649564128; _gid=GA1.2.1986311929.1649564128; _gat_gtag_UA_124047556_1=1; ses=tVC+tO8+hB5GEVR9qpBkj/QRAF2KxCGmiYreub38KZ0AiL7f8czUcQA7mxagv86jie+2cluRlezSYSJHJjK0Oyw0t1WXruozRw7BdDkFY3vSQeI8mGxHG2s1K5k6jjgbpE0a72/GA8/fX9D5ROW+6icTrZ+vIv2NrGUGSdTa7C5YdacWmJdg4JeQc9eT5hvRIVjKCN3uH/3cW0x+UJnZJr0xrvMoqoJi1O1dwS+p+DROIXgH+LTGj1RcAqzqbSSjrIC831qGY6D0jcXmVggaXebVq2OK6/hnudLuTFU4/7YbBzXEVyfYxYj6LmTkFvnFvzHrGSbJ5rwZlzn9u0FMZy15wlaMbqgvvKXg92MbtWccytzK1gKS/MXJxrnHV2mZwkEsFYBgYbhYx2UxYidjpewY/h1xJk8SQSR0gKAtwrn8yz3nXC/3gdICbvDvVRiIPzM99ry7LXMArtjj1eJBfg==; _mkto_trk=id:872-KNP-101&token:_mch-line.biz-1649564144984-86102"
+  login-info: 
+    email: licat233@gmail.com
+    password: wang412line...
+    stayLoggedIn: true
   table: line #mysql数据表
   account-list:
-    - accountId: A28490221213
-      accountName: 艾凱創意行銷股份有限公司 - 植題2
+    - id: A28490221213
+      name: 艾凱創意行銷股份有限公司 - 植題2
       nickname: 自操line3户
       status: on #是否监控
-    - accountId: A96457201158
-      accountName: 艾凱創意行銷股份有限公司 - 鮮活煥顏精華原液4
+    - id: A96457201158
+      name: 艾凱創意行銷股份有限公司 - 鮮活煥顏精華原液4
       nickname: 自操line2户
       status: off #是否监控
-    - accountId: A97230191467
-      accountName: 艾凱創意行銷股份有限公司 - 鮮活煥顏精華原液2
+    - id: A97230191467
+      name: 艾凱創意行銷股份有限公司 - 鮮活煥顏精華原液2
       nickname: 自操line1户
       status: off #是否监控
 popin:
-  cookie: _mgruls=us; mgrudata=id%3D1200%26name%3Dlicat233%2540gmail.com%26type%3Dm%26source%3Dmsnpopin%26t%3D1649906453%26v%3D7150afe9403cc854e24c5152eb48c43e_794bf246e978e0aa37f9ea5120de5c7d72bd9215; mgruli=n%3D%26t%3Dmsnpopin; uid=551c0c1021805e9a9f81638467569915; __mguid_=1bb71d69c8462f286ca2d0715cfc4ee0; __stripe_mid=9e6f9f50-d753-4ec3-aca9-0fd0b3c129345b1d8a; db_ad=detail#imgUrl%2Cdetail#status%2Cdetail#assetName%2Cdetail#campaignName%2Cdetail#campaignId%2Cdetail#cpc%2Cdetail#headline%2Cdetail#brandName%2Cdetail#assetId; __mgck_=4f242f79d8de02fd2bfc956de196944a_1333_1091159_11495469_1648608760|16c869559ffe1b7a9cbad6c44dfd64d0_19068_1145035_11484126_1648608754|ab6340985a9b92b034d8410592dc76d4_1452_1087093_4537084_1648453898|177f988bd85b084ba3ced2f80d25281f_1222_1085062_11111290_1647846057|8d7796c3346eb83ddf85df76b6bc5c31_19536_1246965_11369534_1647842803|261ae5839b5e3eff759e758411805089_1173_1217960_11745292_1647842704|dbec31349486e02c3e4bef0c19a73963_1445_1248236_10470659_1647842507|142a3917b8433d4a2ddc88c0f492c942_1646_1090651_11240249_1647842317|9178a2cfb20a9e0efb31a34f3a20105f_2034_1088241_11125590_1647842296|14edd95d0d54ed7356b9da7c2817d72d_2034_1088241_11184975_1647842252|7dbfc4cb342f4bfc8ac05ade9bb59ae9_1752_1248416_11857644_1647841827|; _nA=61273864f686b63b92763fc4|6184f1e50fc10c153769d104|61a86de0f686b6108c660935|61a884d59a10520a5f7b0044|61a054bb0fc10c1827137535|619ded950fc10c43373d58e5|6132df4d0fc10c69250b4dd4|619ca6d29a10520e3f7e76c4|6184f1e50fc10c153769d104|618c87cb0fc10c3ed30b88c4|6139a58c9a10524f68657b64|61adb31f9a105247ba344d89|61af060d9a1052114f16d834|61adb1669a10523bea734397|61a99d940fc10c76de14c724|61b6b5c2f686b6531a539e66|6184f1e50fc10c153769d104|617c3a2b0fc10c1991617545|61b7efa0f686b639a5508495|616131729a10526d5421e044|61bd52cf9a105226813290a6|60d6cc9ff686b650a5244255|61bd50389a105276e03c5e84|61bc08e09a10524aaa44b824|6194ba39f686b6717d55aca5|61c923d00fc10c3a592aae74|61b70a35f686b60398148e66|61df99de0fc10c28f4762fc4|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|61bd50389a105276e03c5e84|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|624565929a10522b8133ef05; _click=6191f135f686b637416bd636.61df99de0fc10c28f4762fc4.1646636054396.cc_NONE.www%3Asetn%3Acom_DFP_All.banner-3x1_bold.5820a1d3-475c-4db2-995f-13697bad71fa|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647841828385.cc_NONE.www%3Asetn%3Acom.with_sz_word-mobile-3.7dbfc4cb342f4bfc8ac05ade9bb59ae9|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647842252942.cc_NONE.www%3Asetn%3Acom.with_sz_word-mobile.14edd95d0d54ed7356b9da7c2817d72d|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647842297182.cc_NONE.www%3Asetn%3Acom.with_sz_word-mobile-2.9178a2cfb20a9e0efb31a34f3a20105f|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647842318195.cc_NONE.www%3Asetn%3Acom.with_sz_word-mobile-3.142a3917b8433d4a2ddc88c0f492c942|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647842508638.cc_NONE.www%3Achinatimes%3Acom.with_szAd_with_sz_standard_mb_4b4Limg.dbec31349486e02c3e4bef0c19a73963|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647842704029.cc_NONE.www%3Achinatimes%3Acom.with_szAd_with_sz_standard_mb_4b4Limg.261ae5839b5e3eff759e758411805089|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647842803715.cc_NONE.www%3Achinatimes%3Acom.with_szAd_with_sz_standard_img_left.8d7796c3346eb83ddf85df76b6bc5c31|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647846057443.cc_NONE.www%3Asetn%3Acom.with_sz_new_pc.177f988bd85b084ba3ced2f80d25281f|61825e799a10520eb542fde4.61bd50389a105276e03c5e84.1648453898790.cc_NONE.www%3Asetn%3Acom.word-mobile.ab6340985a9b92b034d8410592dc76d4|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1648608754734.cc_NONE.www%3Asetn%3Acom.with_sz_word-pc-3.16c869559ffe1b7a9cbad6c44dfd64d0|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1648608760602.cc_NONE.www%3Asetn%3Acom.with_sz_word-pc.4f242f79d8de02fd2bfc956de196944a|624565589a10522b8133ef04.624565929a10522b8133ef05.1649324770883.cc_lifestyle.www%3Asetn%3Acom.with_sz_mobile_with_recommend.7383a681-ad38-48c5-9b5e-bd6f126ea209; _gid=GA1.2.2116708022.1649906134; MEDIAGOOAUTH=nw_-VUKB1xx8bvDLhyTF8C3h2rppas7VBeHxHXrqBpg2zYR2twcPbFWdEohn-5iF9wBgF13gUoGhRMiQEvLugg; _ga_ZX5XQZNMRL=GS1.1.1649906133.108.1.1649906453.0; _ga=GA1.1.706036391.1646097990; new_db_trend=spend; currency=TWD; db_ads=Management#assetName%2CAds#headline%2CAds#landingPage%2CAds#brandName%2CCost#spend%2CTrafficAcquisition#cpc%2CTrafficAcquisition#click%2CTrafficAcquisition#ctr%2Cconversion#conversion%2Cconversion#conversionRate%2Cconversion#conversionPrice; db_account=Management#accountName%2CCost#spend%2CTrafficAcquisition#impression%2CTrafficAcquisition#click%2CTrafficAcquisition#ctr%2CManagement#accountId%2CTrafficAcquisition#avgCpc%2Cconversion#conversion%2Cconversion#conversionRate%2Cconversion#conversionPrice; db_campaign=Management#campaignName%2CCost#spend%2CCampaigns#campaignBalance%2CTrafficAcquisition#cpc%2CTrafficAcquisition#impression%2CTrafficAcquisition#click%2CTrafficAcquisition#ctr%2Cconversion#conversion%2Cconversion#conversionRate; mgvdata=EomJDvxpGQ8PemBn
-  heartbeat_cookie: mgrudata=id%3D1200%26name%3Dlicat233%2540gmail.com%26type%3Dm%26source%3Dmsnpopin%26t%3D1649906453%26v%3D7150afe9403cc854e24c5152eb48c43e_794bf246e978e0aa37f9ea5120de5c7d72bd9215; mgruli=n%3D%26t%3Dmsnpopin; uid=551c0c1021805e9a9f81638467569915; __mguid_=1bb71d69c8462f286ca2d0715cfc4ee0; __stripe_mid=9e6f9f50-d753-4ec3-aca9-0fd0b3c129345b1d8a; db_ad=detail#imgUrl%2Cdetail#status%2Cdetail#assetName%2Cdetail#campaignName%2Cdetail#campaignId%2Cdetail#cpc%2Cdetail#headline%2Cdetail#brandName%2Cdetail#assetId; __mgck_=4f242f79d8de02fd2bfc956de196944a_1333_1091159_11495469_1648608760|16c869559ffe1b7a9cbad6c44dfd64d0_19068_1145035_11484126_1648608754|ab6340985a9b92b034d8410592dc76d4_1452_1087093_4537084_1648453898|177f988bd85b084ba3ced2f80d25281f_1222_1085062_11111290_1647846057|8d7796c3346eb83ddf85df76b6bc5c31_19536_1246965_11369534_1647842803|261ae5839b5e3eff759e758411805089_1173_1217960_11745292_1647842704|dbec31349486e02c3e4bef0c19a73963_1445_1248236_10470659_1647842507|142a3917b8433d4a2ddc88c0f492c942_1646_1090651_11240249_1647842317|9178a2cfb20a9e0efb31a34f3a20105f_2034_1088241_11125590_1647842296|14edd95d0d54ed7356b9da7c2817d72d_2034_1088241_11184975_1647842252|7dbfc4cb342f4bfc8ac05ade9bb59ae9_1752_1248416_11857644_1647841827|; _nA=61273864f686b63b92763fc4|6184f1e50fc10c153769d104|61a86de0f686b6108c660935|61a884d59a10520a5f7b0044|61a054bb0fc10c1827137535|619ded950fc10c43373d58e5|6132df4d0fc10c69250b4dd4|619ca6d29a10520e3f7e76c4|6184f1e50fc10c153769d104|618c87cb0fc10c3ed30b88c4|6139a58c9a10524f68657b64|61adb31f9a105247ba344d89|61af060d9a1052114f16d834|61adb1669a10523bea734397|61a99d940fc10c76de14c724|61b6b5c2f686b6531a539e66|6184f1e50fc10c153769d104|617c3a2b0fc10c1991617545|61b7efa0f686b639a5508495|616131729a10526d5421e044|61bd52cf9a105226813290a6|60d6cc9ff686b650a5244255|61bd50389a105276e03c5e84|61bc08e09a10524aaa44b824|6194ba39f686b6717d55aca5|61c923d00fc10c3a592aae74|61b70a35f686b60398148e66|61df99de0fc10c28f4762fc4|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|61bd50389a105276e03c5e84|61cad43d0fc10c24f35e4d17|61cad43d0fc10c24f35e4d17|624565929a10522b8133ef05; _click=6191f135f686b637416bd636.61df99de0fc10c28f4762fc4.1646636054396.cc_NONE.www%3Asetn%3Acom_DFP_All.banner-3x1_bold.5820a1d3-475c-4db2-995f-13697bad71fa|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647841828385.cc_NONE.www%3Asetn%3Acom.with_sz_word-mobile-3.7dbfc4cb342f4bfc8ac05ade9bb59ae9|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647842252942.cc_NONE.www%3Asetn%3Acom.with_sz_word-mobile.14edd95d0d54ed7356b9da7c2817d72d|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647842297182.cc_NONE.www%3Asetn%3Acom.with_sz_word-mobile-2.9178a2cfb20a9e0efb31a34f3a20105f|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647842318195.cc_NONE.www%3Asetn%3Acom.with_sz_word-mobile-3.142a3917b8433d4a2ddc88c0f492c942|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647842508638.cc_NONE.www%3Achinatimes%3Acom.with_szAd_with_sz_standard_mb_4b4Limg.dbec31349486e02c3e4bef0c19a73963|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647842704029.cc_NONE.www%3Achinatimes%3Acom.with_szAd_with_sz_standard_mb_4b4Limg.261ae5839b5e3eff759e758411805089|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647842803715.cc_NONE.www%3Achinatimes%3Acom.with_szAd_with_sz_standard_img_left.8d7796c3346eb83ddf85df76b6bc5c31|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1647846057443.cc_NONE.www%3Asetn%3Acom.with_sz_new_pc.177f988bd85b084ba3ced2f80d25281f|61825e799a10520eb542fde4.61bd50389a105276e03c5e84.1648453898790.cc_NONE.www%3Asetn%3Acom.word-mobile.ab6340985a9b92b034d8410592dc76d4|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1648608754734.cc_NONE.www%3Asetn%3Acom.with_sz_word-pc-3.16c869559ffe1b7a9cbad6c44dfd64d0|61cad4050fc10c24f35e4d16.61cad43d0fc10c24f35e4d17.1648608760602.cc_NONE.www%3Asetn%3Acom.with_sz_word-pc.4f242f79d8de02fd2bfc956de196944a|624565589a10522b8133ef04.624565929a10522b8133ef05.1649324770883.cc_lifestyle.www%3Asetn%3Acom.with_sz_mobile_with_recommend.7383a681-ad38-48c5-9b5e-bd6f126ea209; _gid=GA1.2.2116708022.1649906134; MEDIAGOOAUTH=nw_-VUKB1xx8bvDLhyTF8C3h2rppas7VBeHxHXrqBpg2zYR2twcPbFWdEohn-5iF9wBgF13gUoGhRMiQEvLugg; _ga_ZX5XQZNMRL=GS1.1.1649906133.108.1.1649906453.0; _ga=GA1.1.706036391.1646097990; new_db_trend=spend; currency=TWD; db_ads=Management#assetName%2CAds#headline%2CAds#landingPage%2CAds#brandName%2CCost#spend%2CTrafficAcquisition#cpc%2CTrafficAcquisition#click%2CTrafficAcquisition#ctr%2Cconversion#conversion%2Cconversion#conversionRate%2Cconversion#conversionPrice; db_account=Management#accountName%2CCost#spend%2CTrafficAcquisition#impression%2CTrafficAcquisition#click%2CTrafficAcquisition#ctr%2CManagement#accountId%2CTrafficAcquisition#avgCpc%2Cconversion#conversion%2Cconversion#conversionRate%2Cconversion#conversionPrice; db_campaign=Management#campaignName%2CCost#spend%2CCampaigns#campaignBalance%2CTrafficAcquisition#cpc%2CTrafficAcquisition#impression%2CTrafficAcquisition#click%2CTrafficAcquisition#ctr%2Cconversion#conversion%2Cconversion#conversionRate; mgvdata=EomJDvxpGQ8PemBn
+  login-info: 
+    email: licat233@gmail.com
+    password: 205D7E435CD6230A13279F251ED4B3C4
   table: popin
   account-list:
-    - accountId: 1601
-      accountName: Wang_skin01
+    - id: 1601
+      name: Wang_skin01
       nickname: 鸡皮肤1户
       status: on #是否监控
-    - accountId: 1540
-      accountName: Wang_skin02
+    - id: 1540
+      name: Wang_skin02
       nickname: 鸡皮肤2户
       status: off #是否监控
-    - accountId: 1442
-      accountName: Self_White2
+    - id: 1442
+      name: Self_White2
       nickname: 祛斑2户
       status: off #是否监控

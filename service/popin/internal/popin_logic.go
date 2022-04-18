@@ -5,6 +5,7 @@ import (
 	"admonitor-server/common/global"
 	"admonitor-server/common/utils"
 	"admonitor-server/service/model"
+	"admonitor-server/service/popin/internal/spider"
 	"errors"
 	"fmt"
 	"time"
@@ -16,7 +17,15 @@ import (
 
 type PopinLogic struct {
 	Model  *model.PopinModel
-	Spider *Spider
+	Spider *spider.Spider
+}
+
+//AccountConfig 账户信息
+type AccountConfig struct {
+	AccountID   string
+	AccountName string
+	Nickname    string
+	Status      bool
 }
 
 //spiderPopinData 爬取popin数据
@@ -49,15 +58,15 @@ func (l *PopinLogic) spiderPopinData(date time.Time, Type string) (popins []*mod
 			return
 		}
 	}
-	respData := l.Spider.Do(date)
-	if respData == nil {
-		global.LOG.Error(errorx.New("data为nil", errors.New("Spider获取popin广告数据失败")))
+	respData := l.Spider.Statistics(date)
+	if respData == nil { //spider已关闭引起的，则没有数据，就不进行任何操作
+		global.LOG.Error(errorx.New("statistics为nil", errors.New("Spider获取popin广告数据失败")))
 		return
 	}
 	var datas = respData.Data.Detail
 	var accounts []*AccountConfig = AccountList() //由yaml文件提供
 	for _, account := range accounts {
-		if account.Status != true {
+		if account.Status != true { //如果不监控该账户，则跳过
 			continue
 		}
 		for _, data := range datas {
@@ -244,6 +253,7 @@ func (l *PopinLogic) currentLogicPopinData(account string) (*model.Popin, error)
 	if now.Before(utils.TargetTime(now, "00:02:00")) {
 		return nil, errors.New("请等待到当天00:02:00之后再查询")
 	}
+
 	//获取当前最新消耗
 	newestPopin, err := l.Model.FindByDateAndType(account, now, model.NEWEST)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -413,8 +423,8 @@ func AccountList() (res []*AccountConfig) {
 		return
 	}
 	for i := 0; i < n; i++ {
-		accountId := viper.GetString(fmt.Sprintf("popin.account-list.%d.accountId", i))
-		accountName := viper.GetString(fmt.Sprintf("popin.account-list.%d.accountName", i))
+		accountId := viper.GetString(fmt.Sprintf("popin.account-list.%d.id", i))
+		accountName := viper.GetString(fmt.Sprintf("popin.account-list.%d.name", i))
 		nickname := viper.GetString(fmt.Sprintf("popin.account-list.%d.nickname", i))
 		status := viper.GetBool(fmt.Sprintf("popin.account-list.%d.status", i))
 		res = append(res, &AccountConfig{

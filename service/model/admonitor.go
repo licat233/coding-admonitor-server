@@ -4,6 +4,47 @@ import (
 	"time"
 )
 
+// Cookie 爬虫cookies表
+type Cookie struct {
+	ID       int64     `gorm:"primaryKey;column:id" json:"-"`    // 主键
+	Channel  string    `gorm:"column:channel" json:"channel"`    // cookie归属渠道，如：line、popin
+	Account  string    `gorm:"column:account" json:"account"`    // cookie归属账号，如：licat@gmail.com
+	Name     string    `gorm:"column:name" json:"name"`          // 设置的cookie_name
+	Value    string    `gorm:"column:value" json:"value"`        // 设置的cookie_value
+	Domain   string    `gorm:"column:domain" json:"domain"`      // cookie的domain
+	Path     string    `gorm:"column:path" json:"path"`          // cookie的path
+	CreateAt time.Time `gorm:"column:create_at" json:"createAt"` // 创建时间
+	UpdateAt time.Time `gorm:"column:update_at" json:"updateAt"` // 更新时间
+}
+
+// TableName get sql table name.获取数据库表名
+func (m *Cookie) TableName() string {
+	return "cookie"
+}
+
+// CookieColumns get sql column name.获取数据库列名
+var CookieColumns = struct {
+	ID       string
+	Channel  string
+	Account  string
+	Name     string
+	Value    string
+	Domain   string
+	Path     string
+	CreateAt string
+	UpdateAt string
+}{
+	ID:       "id",
+	Channel:  "channel",
+	Account:  "account",
+	Name:     "name",
+	Value:    "value",
+	Domain:   "domain",
+	Path:     "path",
+	CreateAt: "create_at",
+	UpdateAt: "update_at",
+}
+
 // Line Line直投广告数据
 type Line struct {
 	ID         int64     `gorm:"primaryKey;column:id" json:"-"`        // 主键

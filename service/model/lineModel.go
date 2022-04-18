@@ -1,8 +1,18 @@
+/*
+ * @Author: licat
+ * @Date: 2022-04-16 16:09:26
+ * @LastEditors: licat
+ * @LastEditTime: 2022-04-16 16:09:26
+ * @Description: loading edit
+ */
 package model
 
 import (
 	"admonitor-server/common/global"
+	"errors"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type LineModel struct {
@@ -18,18 +28,27 @@ func NewLineModel() *LineModel {
 func (m *LineModel) FindOne(id int64) (*Line, error) {
 	line := new(Line)
 	result := m.DB.WithContext(m.ctx).Model(Line{}).First(line, id)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, result.Error
+	}
 	return line, result.Error
 }
 
 func (m *LineModel) FindByDate(account string, date time.Time) (*Line, error) {
 	line := new(Line)
 	result := m.DB.WithContext(m.ctx).Model(Line{}).Where("account = ? AND DATE(record_date) = ?", account, date.Local().Format("2006-01-02")).First(line)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, result.Error
+	}
 	return line, result.Error
 }
 
 func (m *LineModel) FindByDateAndType(account string, date time.Time, Type string) (*Line, error) {
 	line := new(Line)
 	result := m.DB.WithContext(m.ctx).Model(Line{}).Where("account = ? AND DATE(record_date) = ? AND type = ?", account, date.Local().Format("2006-01-02"), Type).First(line)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, result.Error
+	}
 	return line, result.Error
 }
 

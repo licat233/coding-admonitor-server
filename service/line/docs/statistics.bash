@@ -1,0 +1,16 @@
+curl 'https://admanager.line.biz/api/adservice/v1/my/adaccounts/statistics?groupId=&page=1&size=100&searchKey=&sort=&reportSince=2022-04-16&reportUntil=2022-04-16' \
+  -H 'Connection: keep-alive' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'DNT: 1' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36' \
+  -H 'sentry-trace: 29f06c697ecf4108a974ca0e982a8796-a6b5c5eb4abc5af3-0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Referer: https://admanager.line.biz/adaccount/?duration=hourly&reportSince=2022-04-16&reportUntil=2022-04-16' \
+  -H 'Accept-Language: zh-CN,zh;q=0.9,zh-TW;q=0.8,ja;q=0.7' \
+  -H 'Cookie: _ga=GA1.2.69889969.1647359908; _mkto_trk=id:872-KNP-101&token:_mch-line.biz-1647359909521-71284; trd_cid=16473599332701245; trd_vid_l=2306%3A16473599332701245; trd_vuid_l=7187869272304958905; trd_first_visit=1647359972; _gid=GA1.2.900188525.1650115031; trd_sid=16501151051419229; ses=C4B8aiRo7vYgmLCgGeU+zdXLdGwv49W6EQbA15jhn2dCrwWJYs1kSMUs9DdSZXJBw0WzOaR3XQ87ByEinQmE0nzjlNnUfz2myqQSrcfeHErkZH2jnSvQX4Px7QJ1V0jsHMW8lseRx4l8iGLSTuwe0TOSb0Jwbk0VI8yOzBMZMlhgq013iF0s4+wMASbHh0UB+deoG8KqKLB7pUhMSdiLeoppyLVEG28xNx2SyEwSp1z42g43O5Dxw+r5dAM1L4wsdXD/RSvV+vsYDJME6j3MX4BqeIZ6xocg/Zcb+JIy4SgzTddKvPo7E2AiYDdk95b8qXHEtZQqCIxvWRCsoxgDA5nByKV9bZ9uujVqAlX9ZiDKMl4NkD8210ybFwW2GBU546lzx8pe83Us5BhvBP98nHgB+sm27vHUXzh/7kxe9EvBs5YNuzxu4S+MbTeVYwRvjE3/VeEYoyhLUgVrDy1P5jyYRDahW3WG0JhsEYAO+fg=; _gat_gtag_UA_124047556_1=1; trd_pw=17; trd_pws=2' \
+  --compressed

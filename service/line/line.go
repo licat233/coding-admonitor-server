@@ -1,10 +1,12 @@
 package line
 
 import (
+	"admonitor-server/common/errorx"
 	"admonitor-server/common/global"
 	"admonitor-server/common/timer"
 	"admonitor-server/service/line/internal"
 	"fmt"
+	"sync"
 )
 
 type LineServer struct {
@@ -19,6 +21,38 @@ func NewLineServer() *LineServer {
 	}
 }
 
+//Run 服务器启动程序
+func Run() {
+	var stop = make(chan bool)
+	var wg sync.WaitGroup
+	defer func() {
+		err := recover()
+		if err != nil {
+			if v, ok := err.(error); ok {
+				global.LOG.Error(errorx.New("已经停止LineServer服务", v))
+				fmt.Println(v.Error())
+			} else {
+				fmt.Println(err)
+			}
+			stop <- true
+		}
+	}()
+	lineServer := NewLineServer()
+	lineServer.Start()
+
+	//保持程序后台运行
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		select {
+		case <-stop:
+			fmt.Println("LineServer-Run程序结束运行")
+		}
+	}()
+
+	wg.Wait()
+}
+
 func (a *LineServer) Start() {
 	// defer recovery.RecoverHandler()
 	global.LOG.Info("LineServer启动中...")
@@ -30,25 +64,19 @@ func (a *LineServer) Start() {
 		fmt.Println(msg)
 		return
 	}
-	//添加任务
+	//添加任务，cron v3版本默认不支持秒级定时，spec只能有 5 个field，分、时、天、月、星期几
 	//每隔2分钟获取一次最新line数据
-	a.Timer.AddTaskByFunc("LineNewestData", "0 */2 * * * *", a.LineLogic.InsertNewestData)
+	a.Timer.AddTaskByFunc("LineNewestData", "*/2 * * * *", a.LineLogic.InsertNewestData)
 	//每隔2分钟30秒更新逻辑数据到数据库
-	a.Timer.AddTaskByFunc("CurrentLineLogicData", "0 */2 * * * *", a.LineLogic.UpdateCurrentLogicData)
+	a.Timer.AddTaskByFunc("CurrentLineLogicData", "*/2 * * * *", a.LineLogic.UpdateCurrentLogicData)
 	//每天凌晨 00:02，获取昨日line数据
-	a.Timer.AddTaskByFunc("LineDayData", "0 2 0 * * *", a.LineLogic.InsertDayData)
-	//每天早上 9:30:30，获取该时间节点line数据
-	a.Timer.AddTaskByFunc("LineNodeData", "30 30 9 * * *", a.LineLogic.InsertNodeData)
+	a.Timer.AddTaskByFunc("LineDayData", "2 0 * * *", a.LineLogic.InsertDayData)
+	//每天早上 9:30，获取该时间节点line数据
+	a.Timer.AddTaskByFunc("LineNodeData", "30 9 * * *", a.LineLogic.InsertNodeData)
 	//每天早上 9:32，新建昨日的逻辑line消耗数据
-	a.Timer.AddTaskByFunc("YesterdayLineLogicData", "0 32 9 * * *", a.LineLogic.InsertYesterdayLogicData)
-	//服务巡逻监控
-	a.Timer.AddTaskByFunc("LineNewestData", "0 */1 * * * *", a.monitorLineServer)
-	//开始任务
-	a.Timer.StartTask("LineNewestData")
-	a.Timer.StartTask("CurrentLineLogicData")
-	a.Timer.StartTask("LineDayData")
-	a.Timer.StartTask("LineNodeData")
-	a.Timer.StartTask("YesterdayLineLogicData")
+	a.Timer.AddTaskByFunc("YesterdayLineLogicData", "32 9 * * *", a.LineLogic.InsertYesterdayLogicData)
+	//服务巡逻监控，如果spider已经关闭，则结束所有任务
+	a.Timer.AddTaskByFunc("LineNewestData", "*/1 * * * *", a.monitorLineServer)
 	//提示
 	global.LOG.Info("LineServer已启动")
 	fmt.Println("LineServer已启动")

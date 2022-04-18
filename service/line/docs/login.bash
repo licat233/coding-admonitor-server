@@ -1,0 +1,19 @@
+curl 'https://account.line.biz/api/login/email' \
+  -H 'Connection: keep-alive' \
+  -H 'sec-ch-ua: " Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"' \
+  -H 'DNT: 1' \
+  -H 'X-XSRF-TOKEN: 5a80b16d-ee6b-400f-ab9d-04a13bc17823' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36' \
+  -H 'Content-Type: application/json;charset=UTF-8' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'Origin: https://account.line.biz' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Referer: https://account.line.biz/login?redirectUri=https%3A%2F%2Fadmanager.line.biz%2Flogin%2F&scope=email' \
+  -H 'Accept-Language: zh-CN,zh;q=0.9' \
+  -H 'Cookie: XSRF-TOKEN=5a80b16d-ee6b-400f-ab9d-04a13bc17823; SESSION=MWNkOGZmYjQtYWIxYi00YTdmLThjYzQtNDc0MDViMmJhYTNh' \
+  --data-raw '{"email":"llicat233@gmail.com","password":"wang412line...","stayLoggedIn":true}' \
+  --compressed
