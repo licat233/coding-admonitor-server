@@ -23,7 +23,7 @@ func NewLineServer() *LineServer {
 
 //Run 服务器启动程序
 func Run() {
-	var stop = make(chan bool)
+	var stopCh = make(chan bool)
 	var wg sync.WaitGroup
 	defer func() {
 		err := recover()
@@ -34,7 +34,7 @@ func Run() {
 			} else {
 				fmt.Println(err)
 			}
-			stop <- true
+			stopCh <- true
 		}
 	}()
 	lineServer := NewLineServer()
@@ -45,7 +45,7 @@ func Run() {
 	go func() {
 		defer wg.Done()
 		select {
-		case <-stop:
+		case <-stopCh:
 			fmt.Println("LineServer-Run程序结束运行")
 		}
 	}()

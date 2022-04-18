@@ -23,7 +23,7 @@ func NewPopinServer() *PopinServer {
 
 //Run 服务启动程序
 func Run() {
-	var stop = make(chan bool)
+	var stopCh = make(chan bool)
 	var wg sync.WaitGroup
 	defer func() {
 		err := recover()
@@ -34,7 +34,7 @@ func Run() {
 			} else {
 				fmt.Println(err)
 			}
-			stop <- true
+			stopCh <- true
 		}
 	}()
 	popinServer := NewPopinServer()
@@ -44,7 +44,7 @@ func Run() {
 	go func() {
 		defer wg.Done()
 		select {
-		case <-stop:
+		case <-stopCh:
 			fmt.Println("PopinServer-Run程序结束运行")
 		}
 	}()
