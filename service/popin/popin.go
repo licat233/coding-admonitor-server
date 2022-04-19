@@ -1,6 +1,7 @@
 package popin
 
 import (
+	"admonitor-server/common/emailx"
 	"admonitor-server/common/errorx"
 	"admonitor-server/common/global"
 	"admonitor-server/common/timer"
@@ -34,7 +35,7 @@ func (a *PopinServer) Start() {
 		if err != nil {
 			if v, ok := err.(error); ok {
 				global.LOG.Error(errorx.New("已经停止PopinServer服务", v))
-				global.EMAIL.Send("PopinServer已停止")
+				emailx.Send("PopinServer已停止")
 				fmt.Println(v.Error())
 			} else {
 				fmt.Println(err)

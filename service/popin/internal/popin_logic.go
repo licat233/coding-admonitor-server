@@ -1,13 +1,16 @@
 package internal
 
 import (
+	"admonitor-server/common/emailx"
 	"admonitor-server/common/errorx"
 	"admonitor-server/common/global"
 	"admonitor-server/common/utils"
 	"admonitor-server/service/model"
 	"admonitor-server/service/popin/internal/spider"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -16,8 +19,19 @@ import (
 )
 
 type PopinLogic struct {
-	Model  *model.PopinModel
-	Spider *spider.Spider
+	Model         *model.PopinModel
+	StandardModel *model.StandardModel
+	Spider        *spider.Spider
+}
+
+/** NewPopin 新建popin
+ */
+func NewPopinLogic() *PopinLogic {
+	return &PopinLogic{
+		Model:         model.NewPopinModel(),
+		StandardModel: model.NewStandardModel(),
+		Spider:        spider.NewSpider(),
+	}
 }
 
 //AccountConfig 账户信息
@@ -123,6 +137,9 @@ func (l *PopinLogic) InsertPopinData(popinRecord *model.Popin, date time.Time, T
 		global.LOG.Error("插入的popinRecord数据为空")
 		return
 	}
+	if Type == model.NEWEST {
+		l.monitorHandler(popinRecord, model.NEWEST)
+	}
 	res, err := l.Model.FindByDateAndType(popinRecord.Account, date, Type)
 	if err != nil && err != gorm.ErrRecordNotFound {
 		global.LOG.Error(errorx.New("GORM查询错误", err))
@@ -190,7 +207,86 @@ func (l *PopinLogic) updateCurrentLogicPopinData() {
 			continue
 		}
 		l.InsertPopinData(logicPopin, date, model.LOGIC, true)
+		l.monitorHandler(logicPopin, model.LOGIC)
 	}
+}
+
+//monitorHandler 监控数据，如果不符合标准数据，则发送报警信息
+func (l *PopinLogic) monitorHandler(popin *model.Popin, Type string) {
+	if popin == nil {
+		return
+	}
+	if popin.Cost == 0 {
+		return
+	}
+	typename := ""
+	if Type == model.NEWEST {
+		typename = "newest数据"
+	} else if Type == model.NODE {
+		typename = "node数据"
+	}
+	standard, err := l.StandardModel.FindStandard(l.Spider.Channel, popin.Account)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		//不存在，那就插入一条进去
+		l.StandardModel.InsertOne(&model.Standard{
+			ID:       0,
+			Channel:  l.Spider.Channel,
+			Account:  popin.Account,
+			Imp:      0,
+			Cost:     0,
+			Click:    0,
+			Ctr:      0,
+			Cv:       0,
+			Cvr:      0,
+			Cpa:      0,
+			CreateAt: time.Time{},
+			UpdateAt: time.Time{},
+		})
+		return
+	} else if err != nil {
+		global.LOG.Error(fmt.Errorf("获取%s渠道%s账户的标准数据失败：%s", l.Spider.Channel, popin.Account, err))
+	}
+	if standard == nil {
+		return
+	}
+	var warnMsg []string
+	if standard.Cost != 0 {
+		if popin.Cost > standard.Cost {
+			e := fmt.Errorf("%s渠道%s账户的%sCost数据超过标准数据：%f > %f", l.Spider.Channel, popin.Account, typename, popin.Cost, standard.Cost)
+			global.LOG.Error(e)
+			warnMsg = append(warnMsg, e.Error())
+		}
+	}
+	if standard.Cpa != 0 {
+		if popin.Cpa > standard.Cpa {
+			e := fmt.Errorf("%s渠道%s账户的%sCpa数据超过标准数据：%f > %f", l.Spider.Channel, popin.Account, typename, popin.Cpa, standard.Cpa)
+			global.LOG.Error(e)
+			warnMsg = append(warnMsg, e.Error())
+		}
+	}
+	if standard.Ctr != 0 {
+		if popin.Ctr < standard.Ctr {
+			e := fmt.Errorf("%s渠道%s账户的%sCtr数据低于标准数据：%f < %f", l.Spider.Channel, popin.Account, typename, popin.Ctr, standard.Ctr)
+			global.LOG.Error(e)
+			warnMsg = append(warnMsg, e.Error())
+		}
+	}
+	if standard.Cvr != 0 {
+		if popin.Cvr < standard.Cvr {
+			e := fmt.Errorf("%s渠道%s账户的%svr数据低于标准数据：%f <br %f", l.Spider.Channel, popin.Account, typename, popin.Cvr, standard.Cvr)
+			global.LOG.Error(e)
+			warnMsg = append(warnMsg, e.Error())
+		}
+	}
+	if len(warnMsg) == 0 {
+		return
+	}
+	//发送报警邮件
+	msg := strings.Join(warnMsg, "\n</br>")
+	b, _ := json.Marshal(popin)
+	logicData := fmt.Sprintf("当前%s数据：%s", typename, string(b))
+	go emailx.Send(msg + logicData)
+	return
 }
 
 //RangeDayCost 获取某账户范围日期内的全天总消耗

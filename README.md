@@ -14,6 +14,11 @@
 * AdmonitorUI开发：为方便使用手机实时查看数据，考虑开发小程序【❓】
 * 开发框架：uni-app【<https://uniapp.dcloud.io>】
 
+## 关于报警系统
+
+* 当某一指标数据过低时，会向【licat233@gmail.com】发送警报信息
+* 如popin的关键数据CVR，popin关键数据CPA
+
 ## 服务结构  
 
 ![mindImg](./deploy/docs/广告数据监控服务-Admonitor-server.svg)

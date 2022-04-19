@@ -1,6 +1,7 @@
 package line
 
 import (
+	"admonitor-server/common/emailx"
 	"admonitor-server/common/errorx"
 	"admonitor-server/common/global"
 	"admonitor-server/common/timer"
@@ -34,7 +35,7 @@ func (a *LineServer) Start() {
 		if err != nil {
 			if v, ok := err.(error); ok {
 				global.LOG.Error(errorx.New("已经停止LineServer服务", v))
-				global.EMAIL.Send("LineServer已停止")
+				emailx.Send("LineServer已停止")
 				fmt.Println(v.Error())
 			} else {
 				fmt.Println(err)

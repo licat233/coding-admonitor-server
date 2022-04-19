@@ -1,7 +1,6 @@
 package config
 
 import (
-	"admonitor-server/common/emailx"
 	"admonitor-server/common/global"
 	"admonitor-server/common/gromx"
 	"admonitor-server/common/logx"
@@ -17,5 +16,4 @@ func Initialize() {
 	global.DB = gromx.NewGromDB()
 	// global.REDIS = redisx.NewRedis() //暂时不需要
 	global.TIMER = timer.NewTimerTask()
-	global.EMAIL = emailx.NewEmail()
 }

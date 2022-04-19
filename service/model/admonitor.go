@@ -162,3 +162,53 @@ var PopinColumns = struct {
 	CreateAt:   "create_at",
 	UpdateAt:   "update_at",
 }
+
+// Standard 广告数据标准
+type Standard struct {
+	ID       int64     `gorm:"primaryKey;column:id" json:"-"`    // 主键
+	Channel  string    `gorm:"column:channel" json:"channel"`    // 渠道，如line，popin
+	Account  string    `gorm:"column:account" json:"account"`    // 账号,如鸡皮肤账号，祛斑账号
+	Imp      int64     `gorm:"column:imp" json:"imp"`            // 展现
+	Cost     float64   `gorm:"column:cost" json:"cost"`          // 消耗
+	Click    int64     `gorm:"column:click" json:"click"`        // 点击
+	Ctr      float64   `gorm:"column:ctr" json:"ctr"`            // 点击率
+	Cv       int64     `gorm:"column:cv" json:"cv"`              // 转化
+	Cvr      float64   `gorm:"column:cvr" json:"cvr"`            // 转化率
+	Cpa      float64   `gorm:"column:cpa" json:"cpa"`            // 转化成本
+	CreateAt time.Time `gorm:"column:create_at" json:"createAt"` // 修改日期
+	UpdateAt time.Time `gorm:"column:update_at" json:"updateAt"` // 更新日期
+}
+
+// TableName get sql table name.获取数据库表名
+func (m *Standard) TableName() string {
+	return "standard"
+}
+
+// StandardColumns get sql column name.获取数据库列名
+var StandardColumns = struct {
+	ID       string
+	Channel  string
+	Account  string
+	Imp      string
+	Click    string
+	Ctr      string
+	Cv       string
+	Cvr      string
+	Cpa      string
+	CreateAt string
+	UpdateAt string
+	Cost     string
+}{
+	ID:       "id",
+	Channel:  "channel",
+	Account:  "account",
+	Imp:      "imp",
+	Click:    "click",
+	Ctr:      "ctr",
+	Cv:       "cv",
+	Cvr:      "cvr",
+	Cpa:      "cpa",
+	CreateAt: "create_at",
+	UpdateAt: "update_at",
+	Cost:     "cost",
+}

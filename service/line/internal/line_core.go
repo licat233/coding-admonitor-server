@@ -1,19 +1,9 @@
 package internal
 
 import (
-	"admonitor-server/service/line/internal/spider"
 	"admonitor-server/service/model"
 	"errors"
 )
-
-/** NewLine 新建lineLogic
- */
-func NewLineLogic() *LineLogic {
-	return &LineLogic{
-		Model:  model.NewLineModel(),
-		Spider: spider.NewSpider(),
-	}
-}
 
 //InsertNewestData 插入今天最新的数据到数据库
 func (l *LineLogic) InsertNewestData() {

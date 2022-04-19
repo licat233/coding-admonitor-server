@@ -11,7 +11,7 @@
  Target Server Version : 80024
  File Encoding         : 65001
 
- Date: 19/04/2022 11:40:48
+ Date: 19/04/2022 18:36:39
 */
 
 SET NAMES utf8mb4;
@@ -36,7 +36,7 @@ CREATE TABLE `cookie` (
   KEY `index_2` (`account`),
   KEY `index_3` (`name`),
   KEY `index_4` (`domain`)
-) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='爬虫cookies表';
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='爬虫cookies表';
 
 -- ----------------------------
 -- Table structure for line
@@ -62,7 +62,7 @@ CREATE TABLE `line` (
   KEY `index_1` (`account`),
   KEY `index_2` (`type`),
   KEY `index_3` (`record_date`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Line直投广告数据';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Line直投广告数据';
 
 -- ----------------------------
 -- Table structure for popin
@@ -88,6 +88,26 @@ CREATE TABLE `popin` (
   KEY `index_1` (`account`),
   KEY `index_2` (`type`),
   KEY `index_3` (`record_date`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Line直投广告数据';
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Line直投广告数据';
+
+-- ----------------------------
+-- Table structure for standard
+-- ----------------------------
+DROP TABLE IF EXISTS `standard`;
+CREATE TABLE `standard` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `channel` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '渠道，如line，popin',
+  `account` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '账号,如鸡皮肤账号，祛斑账号',
+  `imp` int NOT NULL DEFAULT '0' COMMENT '展现',
+  `cost` decimal(10,0) NOT NULL DEFAULT '0' COMMENT '消耗',
+  `click` int NOT NULL DEFAULT '0' COMMENT '点击',
+  `ctr` float NOT NULL DEFAULT '0' COMMENT '点击率',
+  `cv` int NOT NULL DEFAULT '0' COMMENT '转化',
+  `cvr` float NOT NULL DEFAULT '0' COMMENT '转化率',
+  `cpa` decimal(10,0) NOT NULL DEFAULT '0' COMMENT '转化成本',
+  `create_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改日期',
+  `update_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新日期',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='广告数据标准';
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -19,7 +19,7 @@ type Email struct {
 	Receiver []string
 }
 
-func NewEmail() *Email {
+func Send(msg string, to ...string) error {
 	email := &Email{
 		Username: viper.GetString("email.username"),
 		Password: viper.GetString("email.password"),
@@ -36,16 +36,12 @@ func NewEmail() *Email {
 	email.Dialer = gomail.NewDialer(email.Host, email.Port, email.Username, email.Password)
 	// 关闭SSL协议认证
 	email.Dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
-	return email
-}
-
-func (e *Email) Send(msg string, to ...string) error {
 	if len(to) != 0 {
-		e.Receiver = append(e.Receiver, to...)
-		e.Message.SetHeader("To", e.Receiver...)
+		email.Receiver = append(email.Receiver, to...)
+		email.Message.SetHeader("To", email.Receiver...)
 	}
-	e.Message.SetBody("text/html", emailBody(msg))
-	if err := e.Dialer.DialAndSend(e.Message); err != nil {
+	email.Message.SetBody("text/html", emailBody(msg))
+	if err := email.Dialer.DialAndSend(email.Message); err != nil {
 		logx.NewLogger().Error(errorx.New("邮件发送失败", err))
 		return err
 	}

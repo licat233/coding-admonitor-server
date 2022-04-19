@@ -2,18 +2,8 @@ package internal
 
 import (
 	"admonitor-server/service/model"
-	"admonitor-server/service/popin/internal/spider"
 	"errors"
 )
-
-/** NewPopin 新建line
- */
-func NewPopinLogic() *PopinLogic {
-	return &PopinLogic{
-		Model:  model.NewPopinModel(),
-		Spider: spider.NewSpider(),
-	}
-}
 
 //InsertNewestData 插入今天最新的数据到数据库
 func (l *PopinLogic) InsertNewestData() {

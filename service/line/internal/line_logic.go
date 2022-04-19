@@ -1,13 +1,16 @@
 package internal
 
 import (
+	"admonitor-server/common/emailx"
 	"admonitor-server/common/errorx"
 	"admonitor-server/common/global"
 	"admonitor-server/common/utils"
 	"admonitor-server/service/line/internal/spider"
 	"admonitor-server/service/model"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -16,8 +19,19 @@ import (
 )
 
 type LineLogic struct {
-	Model  *model.LineModel
-	Spider *spider.Spider
+	Model         *model.LineModel
+	StandardModel *model.StandardModel
+	Spider        *spider.Spider
+}
+
+/** NewLine 新建lineLogic
+ */
+func NewLineLogic() *LineLogic {
+	return &LineLogic{
+		Model:         model.NewLineModel(),
+		StandardModel: model.NewStandardModel(),
+		Spider:        spider.NewSpider(),
+	}
 }
 
 //AccountConfig 账户信息
@@ -114,6 +128,7 @@ func (l *LineLogic) createLineData(Type string, replace bool) {
 	lineRecords := l.spiderLineData(date, Type)
 	for _, lineRecord := range lineRecords {
 		l.InsertLineData(lineRecord, date, Type, replace)
+
 	}
 	return
 }
@@ -123,6 +138,9 @@ func (l *LineLogic) InsertLineData(lineRecord *model.Line, date time.Time, Type 
 	if lineRecord == nil {
 		global.LOG.Error("插入的lineRecord数据为空")
 		return
+	}
+	if Type == model.NEWEST {
+		l.monitorHandler(lineRecord, model.NEWEST)
 	}
 	res, err := l.Model.FindByDateAndType(lineRecord.Account, date, Type)
 	if err != nil && err != gorm.ErrRecordNotFound {
@@ -191,7 +209,86 @@ func (l *LineLogic) updateCurrentLogicLineData() {
 			continue
 		}
 		l.InsertLineData(logicLine, date, model.LOGIC, true)
+		l.monitorHandler(logicLine, model.LOGIC)
 	}
+}
+
+//monitorHandler 监控数据，如果不符合标准数据，则发送报警信息
+func (l *LineLogic) monitorHandler(line *model.Line, Type string) {
+	if line == nil {
+		return
+	}
+	if line.Cost == 0 {
+		return
+	}
+	typename := ""
+	if Type == model.NEWEST {
+		typename = "newest数据"
+	} else if Type == model.NODE {
+		typename = "node数据"
+	}
+	standard, err := l.StandardModel.FindStandard(l.Spider.Channel, line.Account)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		//不存在，那就插入一条进去
+		l.StandardModel.InsertOne(&model.Standard{
+			ID:       0,
+			Channel:  l.Spider.Channel,
+			Account:  line.Account,
+			Imp:      0,
+			Cost:     0,
+			Click:    0,
+			Ctr:      0,
+			Cv:       0,
+			Cvr:      0,
+			Cpa:      0,
+			CreateAt: time.Time{},
+			UpdateAt: time.Time{},
+		})
+		return
+	} else if err != nil {
+		global.LOG.Error(fmt.Errorf("获取%s渠道%s账户的标准数据失败：%s", l.Spider.Channel, line.Account, err))
+	}
+	if standard == nil {
+		return
+	}
+	var warnMsg []string
+	if standard.Cost != 0 {
+		if line.Cost > standard.Cost {
+			e := fmt.Errorf("%s渠道%s账户的%sCost数据超过标准数据：%f > %f", l.Spider.Channel, line.Account, typename, line.Cost, standard.Cost)
+			global.LOG.Error(e)
+			warnMsg = append(warnMsg, e.Error())
+		}
+	}
+	if standard.Cpa != 0 {
+		if line.Cpa > standard.Cpa {
+			e := fmt.Errorf("%s渠道%s账户的%sCpa数据超过标准数据：%f > %f", l.Spider.Channel, line.Account, typename, line.Cpa, standard.Cpa)
+			global.LOG.Error(e)
+			warnMsg = append(warnMsg, e.Error())
+		}
+	}
+	if standard.Ctr != 0 {
+		if line.Ctr < standard.Ctr {
+			e := fmt.Errorf("%s渠道%s账户的%sCtr数据低于标准数据：%f < %f", l.Spider.Channel, line.Account, typename, line.Ctr, standard.Ctr)
+			global.LOG.Error(e)
+			warnMsg = append(warnMsg, e.Error())
+		}
+	}
+	if standard.Cvr != 0 {
+		if line.Cvr < standard.Cvr {
+			e := fmt.Errorf("%s渠道%s账户的%svr数据低于标准数据：%f <br %f", l.Spider.Channel, line.Account, typename, line.Cvr, standard.Cvr)
+			global.LOG.Error(e)
+			warnMsg = append(warnMsg, e.Error())
+		}
+	}
+	if len(warnMsg) == 0 {
+		return
+	}
+	//发送报警邮件
+	msg := strings.Join(warnMsg, "\n</br>")
+	b, _ := json.Marshal(line)
+	logicData := fmt.Sprintf("当前%s数据：%s", typename, string(b))
+	go emailx.Send(msg + logicData)
+	return
 }
 
 //RangeDayCost 获取某账户范围日期内的全天总消耗
