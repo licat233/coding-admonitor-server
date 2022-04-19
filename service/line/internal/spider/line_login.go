@@ -14,6 +14,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gocolly/colly/v2"
@@ -70,6 +71,7 @@ func (s *Spider) Login() {
 	//添加请求头信息
 	c.OnRequest(func(req *colly.Request) {
 		loginHeader(req.Headers)
+		//X-XSRF-TOKEN: f1a81ead-e82f-47c5-b091-04159061b6ce
 		req.Headers.Add(csrfToken_name, csrfToken_value)
 	})
 	//设置cookies
@@ -98,9 +100,31 @@ func (s *Spider) Login() {
 		if status == "success" {
 			global.LOG.Info("line登录成功")
 			//登录成功，获取该网站的cookies
-			cookies := c.Cookies(url)
-			//将新的cookies与旧cookies合并
-			mergeCookies(s.Cookies, cookies)
+			// fmt.Println(r.Headers.Get("Set-Cookie"))
+			// cookies := c.Cookies(url)
+			cookies := []*http.Cookie{}
+			//注意:line的cookie故意以==结尾，所以colly自动提取到的cookie值结尾会少一个=号，保险起见，我们自己提取
+			cookieValues := r.Headers.Values("Set-Cookie")
+			for _, value := range cookieValues {
+				//查找第一个【;】位置
+				index1 := strings.Index(value, ";")
+				if index1 == -1 {
+					continue
+				}
+				//截取字符串
+				s1 := value[:index1]
+				//查找第一个【=】位置
+				index2 := strings.Index(s1, "=")
+				if index2 == -1 {
+					continue
+				}
+				//截取字符串
+				name := s1[:index2]
+				value := s1[index2+1:]
+				cookies = append(cookies, genHttpCookie(name, value))
+			}
+			//更新spider的cookies
+			s.mergeCookies(cookies)
 			//更新数据库
 			if err := s.UpdateModelCookies(); err != nil {
 				e = fmt.Errorf("同步cookie至数据库失败:%w", err)
@@ -117,6 +141,13 @@ func (s *Spider) Login() {
 	c.Wait()
 	if e != nil {
 		s.loginError(e)
+		return
+	}
+	global.LOG.Info("line登录成功")
+	//即使登录成功，也要使用accountInfo()检测一下新的cookie是否可用
+	if s.accountInfo() == nil {
+		//如果不能使用，则停止爬虫
+		s.loginError(errors.New("新cookie无效"))
 	}
 	return
 }
@@ -146,7 +177,7 @@ func (s *Spider) loginPage() (cookies []*http.Cookie, csrfToken_name, csrfToken_
 			e = fmt.Errorf("loginPage响应状态码为%d", r.StatusCode)
 			return
 		}
-		//获取SESSION会话ID等cookie
+		//获取响应的cookie
 		cookies = c.Cookies(url)
 	})
 	c.OnError(func(resp *colly.Response, err error) {
@@ -177,7 +208,7 @@ func loginPageHeader(headers *http.Header) {
 	headers.Add("sec-ch-ua-platform", "\"macOS\"")
 	headers.Add("DNT", "1")
 	headers.Add("Upgrade-Insecure-Requests", "1")
-	headers.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36")
+	headers.Add("User-Agent", UserAgent)
 	headers.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
 	headers.Add("Sec-Fetch-Site", "none")
 	headers.Add("Sec-Fetch-Mode", "navigate")
@@ -191,7 +222,7 @@ func loginHeader(headers *http.Header) {
 	headers.Add("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"99\", \"Google Chrome\";v=\"99\"")
 	headers.Add("DNT", "1")
 	headers.Add("sec-ch-ua-mobile", "?0")
-	headers.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36")
+	headers.Add("User-Agent", UserAgent)
 	headers.Add("Content-Type", "application/json;charset=UTF-8")
 	headers.Add("Accept", "application/json, text/plain, */*")
 	headers.Add("sec-ch-ua-platform", "\"macOS\"")

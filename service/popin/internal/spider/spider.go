@@ -52,7 +52,7 @@ func NewSpider() *Spider {
 		CacheUrl:        "",
 		StaticTime:      time.Time{},
 		HeartbeatTimer:  5 * time.Minute,
-		Cookies:         nil,
+		Cookies:         []*http.Cookie{},
 		Domain:          "ads.popin.cc",
 		Close:           false,
 		LoginTime:       time.Time{},

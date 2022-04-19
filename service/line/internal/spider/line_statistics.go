@@ -12,6 +12,55 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
+type StatisticsResp struct {
+	Datas  []AccountCostData `json:"datas"`
+	Paging struct {
+		Page          int64    `json:"page"`
+		Size          int64    `json:"size"`
+		TotalElements int64    `json:"total_elements"`
+		Sorts         []string `json:"sorts"`
+	} `json:"paging"`
+	ReportCommand struct {
+		Since string `json:"since"`
+		Until string `json:"until"`
+	} `json:"reportCommand"`
+}
+
+type AccountCostData struct {
+	Id               string `json:"id"`
+	AccountInfo      `json:"account"`
+	ConfiguredStatus string `json:"configuredStatus"`
+	DeliveryStatus   string `json:"deliveryStatus"`
+	Statistics       `json:"statistics"`
+}
+
+type AccountInfo struct {
+	Id               string `json:"id"`
+	Name             string `json:"name"`
+	ProductName      string `json:"productName"`
+	Timezone         string `json:"timezone"`
+	ConfiguredStatus string `json:"configuredStatus"`
+	CorporateName    string `json:"corporateName"`
+	Country          string `json:"country"`
+	Currency         string `json:"currency"`
+	CurrencySymbol   string `json:"currencySymbol"`
+	DeliveryStatus   string `json:"deliveryStatus"`
+}
+
+type Statistics struct {
+	Imp            int64   `json:"imp"`
+	Click          int64   `json:"click"`
+	Cv             int64   `json:"cv"`
+	Ctr            float64 `json:"ctr"`
+	Cvr            float64 `json:"cvr"`
+	Cpm            float64 `json:"cpm"`
+	Cpc            float64 `json:"cpc"`
+	Cpa            float64 `json:"cpa"`
+	Cost           float64 `json:"cost"`
+	Currency       string  `json:"currency"`
+	CurrencySymbol string  `json:"currencySymbol"`
+}
+
 func satisticsURL(date time.Time) string {
 	todayDate := date.Format("2006-01-02")
 	return fmt.Sprintf("https://admanager.line.biz/api/adservice/v1/my/adaccounts/statistics?groupId=&page=1&size=100&searchKey=&sort=&reportSince=%s&reportUntil=%s", todayDate, todayDate)
@@ -33,7 +82,7 @@ func (s *Spider) Statistics(date time.Time) (resp *StatisticsResp) {
 	Colly.OnRequest(func(req *colly.Request) {
 		statisticsHeader(req.Headers)
 	})
-	Colly.SetCookies(s.Domain, s.Cookies)
+	Colly.SetCookies(url, s.Cookies)
 	var e error
 	Colly.OnResponse(func(r *colly.Response) {
 		if r.StatusCode != 200 {
@@ -95,6 +144,6 @@ func statisticsHeader(headers *http.Header) {
 	headers.Add("Sec-Fetch-Dest", "empty")
 	headers.Add("Sec-Fetch-Mode", "cors")
 	headers.Add("Sec-Fetch-Site", "same-origin")
-	headers.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36")
+	headers.Add("User-Agent", UserAgent)
 	headers.Add("sentry-trace", "3e630a83fc154dcb8603694c5f14dabd-88912279c7b81e26-0")
 }

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/gocolly/colly/v2"
@@ -87,9 +88,9 @@ func (s *Spider) Statistics(date time.Time) (resp *StatisticsResp) {
 
 	Colly := colly.NewCollector(colly.Async(false))
 	Colly.OnRequest(func(req *colly.Request) {
-		headerHandler(req.Headers)
+		statisticsHeader(req.Headers)
 	})
-	Colly.SetCookies(s.Domain, s.Cookies)
+	Colly.SetCookies(url, s.Cookies)
 	var e error
 	Colly.OnResponse(func(r *colly.Response) {
 		if r.StatusCode != 200 {
@@ -126,6 +127,10 @@ func (s *Spider) Statistics(date time.Time) (resp *StatisticsResp) {
 		s.statisticsError(e)
 		return
 	}
+	//echo
+	// for _, cookie := range Colly.Cookies(url) {
+	// 	fmt.Printf("%s=%s\n", cookie.Name, cookie.Value)
+	// }
 	return resp
 }
 
@@ -138,4 +143,19 @@ func (s *Spider) statisticsError(err error) {
 		return
 	}
 	panic(fmt.Errorf(errorx.New("popin_statistics失败", err)))
+}
+
+func statisticsHeader(headers *http.Header) {
+	headers.Add("Accept", "application/json")
+	headers.Add("User-Agent", UserAgent)
+	headers.Add("Accept-Language", "zh-CN,zh;q=0.9,zh-TW;q=0.8,ja;q=0.7")
+	headers.Add("Connection", "keep-alive")
+	headers.Add("Referer", "https://ads.popin.cc/platform/new_dashboard")
+	headers.Add("Referrer-Policy", "strict-origin-when-cross-origin")
+	headers.Add("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"99\", \"Google Chrome\";v=\"99\"")
+	headers.Add("sec-ch-ua-mobile", "?0")
+	headers.Add("sec-ch-ua-platform", "macOS")
+	headers.Add("Sec-Fetch-Dest", "empty")
+	headers.Add("Sec-Fetch-Mode", "cors")
+	headers.Add("Sec-Fetch-Site", "same-origin")
 }

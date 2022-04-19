@@ -1,0 +1,16 @@
+#popin-statistics登录获取到的cookies
+Set-Cookie：mgvdata=718JjWKfONnkZhud
+Set-Cookie：MEDIAGOOAUTH=Sfd5Qw-zvu3jteSx6jQvKyr1eNLOYPToKUGEopZf4G28Y8Bo0nz8ItPLMzPwz4D3rTahbv1vdPVhF7qBIJeRhQ
+
+#popin-heartbeat心跳后获取到的cookies
+Set-Cookie：mgruli=n%3D%26t%3Dmsnpopin
+
+#popin-statistics获取数据后得到的cookies
+无
+
+#核心cookie
+mgrudata=id%3D1200%26name%3Dlicat233%2540gmail.com%26type%3Dm%26source%3Dmsnpopin%26t%3D1650286145%26v%3D08798c9a67d2d0128958455b9829d5b0_cd4818d9a5f3f241e45d2d73a0f8523d5489835d; 
+
+
+#未知cookie
+_mgruls=us; mgrudata=id%3D1200%26name%3Dlicat233%2540gmail.com%26type%3Dm%26source%3Dmsnpopin%26t%3D1650286145%26v%3D08798c9a67d2d0128958455b9829d5b0_cd4818d9a5f3f241e45d2d73a0f8523d5489835d; mgruli=n%3D%26t%3Dmsnpopin; new_db_trend=spend; currency=TWD; mgvdata=718JjWKfONnkZhud; MEDIAGOOAUTH=y8oLbjKAr8dn88Poz_aL1XtpjGizOp5uVYzZh5O-s8GtpimiHzmqXl82u1nzS0BB8it_xdjDRZCmQrjIzRff_w

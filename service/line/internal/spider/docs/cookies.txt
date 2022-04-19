@@ -9,3 +9,15 @@
 "_trmcuser":"{\"id\":\"\"}",
 "_trmcsession":"{\"id\":\"f292deba58c17ca0\",\"path\":\"/login\",\"query\":\"?redirectUri+https%3A%2F%2Fadmanager.line.biz%2Flogin%2F&scope+email\",\"params\":{},\"time\":1650125186356}",
 "_trmcpage":"/login",
+
+
+#首次访问页面时，响应头
+Set-Cookie: XSRF-TOKEN=f1a81ead-e82f-47c5-b091-04159061b6ce; Path=/; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: SESSION=NDU4NzBlMGItMmQzOS00OTU1LWE5ZmUtMjVhMjE4ZTcyZjNl; Path=/; Secure; HttpOnly
+
+#登录验证时，请求头
+Cookie: XSRF-TOKEN=f1a81ead-e82f-47c5-b091-04159061b6ce; SESSION=NDU4NzBlMGItMmQzOS00OTU1LWE5ZmUtMjVhMjE4ZTcyZjNl;
+X-XSRF-TOKEN: f1a81ead-e82f-47c5-b091-04159061b6ce
+
+#登录验证时，响应头
+Set-Cookie: ses=H8wOrks/RNoF/sW85rR3k7ZhGgG9Vg33r9EI9elTl6lqPiEq3E/cfhgLgH145mqqwAVtOZgQ9U0atmFZp17+liQcZDkj+gufdJpKIIjjdp0SPnSCnwHzkzpYHYRlc7DMfv3bDrB7wu094cwmXh0ornRtrjr7pAwfSB9S2SIZniaOR7/F1ewBsZbBW0uwsXVTDJpC4RF7uPhCIJloRC8yjkxAWxBaCCWzN157S1+RkhRu7WxG5ptxvRe49utn0EJTk2gSlsp0olR+5LZNf/yhiDBVlX+U9kPmxsSQ1zSVDshXAm7cB9Yfaio6lozYahrJ7pDw0rMwMEyXfJionXF/AFiG8mWDOhuCaN+KnilfW3sfYxuAGS9CXC+kzv3PE5gjdj8BH07LFL1Jx6D/ciPZKNPt5qfFBVNtuKL18mmiyoi4tRliATPNk4U8pPsoO+31znTlSZSm+Boa4xZLyQXEIg==; Max-Age=2592000; Expires=Wed, 18-May-2022 09:17:44 GMT; Domain=line.biz; Path=/; Secure; HttpOnly

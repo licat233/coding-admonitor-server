@@ -247,7 +247,7 @@ func (l *LineLogic) TotalCost(account string, start, end time.Time) (float64, er
 	return 0, nil
 }
 
-//CurrentLineData 获取某账户前最新logic消耗，recordDate已设置
+//CurrentLineData 获取某账户前最新logic消耗，源于mysql
 func (l *LineLogic) currentLogicLineData(account string) (*model.Line, error) {
 	logicDate := utils.NowLogicDate()
 	now := time.Now().Local()
@@ -331,8 +331,7 @@ func (l *LineLogic) LogicLineDataByDate(account string, date time.Time) (*model.
 			UpdateAt:   date,
 		}
 		// return nil, fmt.Errorf("数据库缺失%s的节点数据", date.Format("2006-01-02"))
-	}
-	if err != nil {
+	} else if err != nil {
 		global.LOG.Error(errorx.New("GORM查询错误", err))
 		return nil, err
 	}
@@ -365,6 +364,10 @@ func (l *LineLogic) CalculateOnNodeBefore(yerDayLine, yerNodeLine, nodeLine *mod
 	ctr := utils.CtrCalculation(click, imp)
 	cvr := utils.CvrCalculation(cv, click)
 	cpa := utils.CpaCalculation(cost, cv)
+	var status bool
+	if yerNodeLine.Cost != 0 {
+		status = true
+	}
 	return &model.Line{
 		Account:    yerNodeLine.Account,
 		Cost:       cost,
@@ -374,7 +377,7 @@ func (l *LineLogic) CalculateOnNodeBefore(yerDayLine, yerNodeLine, nodeLine *mod
 		Cv:         cv,
 		Cvr:        cvr,
 		Cpa:        cpa,
-		Status:     nodeLine.Status,
+		Status:     status,
 		Type:       model.LOGIC,
 		Currency:   nodeLine.Currency,
 		RecordDate: yerNodeLine.RecordDate,
@@ -396,6 +399,10 @@ func (l *LineLogic) CalculateOnNodeAfter(newestLine, nodeLine *model.Line) *mode
 	ctr := utils.CtrCalculation(click, imp)
 	cvr := utils.CvrCalculation(cv, click)
 	cpa := utils.CpaCalculation(cost, cv)
+	var status bool
+	if nodeLine.Cost != 0 {
+		status = true
+	}
 	return &model.Line{
 		Account:    nodeLine.Account,
 		Cost:       cost,
@@ -405,7 +412,7 @@ func (l *LineLogic) CalculateOnNodeAfter(newestLine, nodeLine *model.Line) *mode
 		Cv:         cv,
 		Cvr:        cvr,
 		Cpa:        cpa,
-		Status:     nodeLine.Status,
+		Status:     status,
 		Type:       model.LOGIC,
 		Currency:   nodeLine.Currency,
 		RecordDate: nodeLine.RecordDate,

@@ -331,8 +331,7 @@ func (l *PopinLogic) LogicPopinDataByDate(account string, date time.Time) (*mode
 			UpdateAt:   date,
 		}
 		// return nil, fmt.Errorf("数据库缺失%s的节点数据", date.Format("2006-01-02"))
-	}
-	if err != nil {
+	} else if err != nil {
 		global.LOG.Error(errorx.New("GORM查询错误", err))
 		return nil, err
 	}
@@ -365,6 +364,10 @@ func (l *PopinLogic) CalculateOnNodeBefore(yerDayPopin, yerNodePopin, nodePopin 
 	ctr := utils.CtrCalculation(click, imp)
 	cvr := utils.CvrCalculation(cv, click)
 	cpa := utils.CpaCalculation(cost, cv)
+	var status bool
+	if yerNodePopin.Cost != 0 {
+		status = true
+	}
 	return &model.Popin{
 		Account:    yerNodePopin.Account,
 		Cost:       cost,
@@ -374,7 +377,7 @@ func (l *PopinLogic) CalculateOnNodeBefore(yerDayPopin, yerNodePopin, nodePopin 
 		Cv:         cv,
 		Cvr:        cvr,
 		Cpa:        cpa,
-		Status:     nodePopin.Status,
+		Status:     status,
 		Type:       model.LOGIC,
 		Currency:   nodePopin.Currency,
 		RecordDate: yerNodePopin.RecordDate,
@@ -396,6 +399,10 @@ func (l *PopinLogic) CalculateOnNodeAfter(newestPopin, nodePopin *model.Popin) *
 	ctr := utils.CtrCalculation(click, imp)
 	cvr := utils.CvrCalculation(cv, click)
 	cpa := utils.CpaCalculation(cost, cv)
+	var status bool
+	if nodePopin.Cost != 0 {
+		status = true
+	}
 	return &model.Popin{
 		Account:    nodePopin.Account,
 		Cost:       cost,
@@ -405,7 +412,7 @@ func (l *PopinLogic) CalculateOnNodeAfter(newestPopin, nodePopin *model.Popin) *
 		Cv:         cv,
 		Cvr:        cvr,
 		Cpa:        cpa,
-		Status:     nodePopin.Status,
+		Status:     status,
 		Type:       model.LOGIC,
 		Currency:   nodePopin.Currency,
 		RecordDate: nodePopin.RecordDate,

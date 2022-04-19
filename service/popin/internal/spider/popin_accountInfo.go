@@ -13,12 +13,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/gocolly/colly/v2"
 )
 
-/** 心跳的响应 **/
-type HeartbeatResp struct {
+/** accountInfoResp的响应 **/
+type accountInfoResp struct {
 	Code int `json:"code"`
 	Data struct {
 		AdAuditNum             string        `json:"adAuditNum"`
@@ -40,36 +41,36 @@ type UserTags struct {
  * 如果失效，则重新登录，更新cookie
  */
 func (s *Spider) Heartbeat() {
-	//通过心跳检测cookie是否有效
-	if s.heartbeat() == false {
+	//通过获取accountInfo检测cookie是否有效
+	if s.accountInfo() == nil {
 		//cookie失效
 		//需要登录，获取新的cookie
 		s.Login()
 	}
 }
 
-/** heartbeat 心跳，用于检测cookie是否有效
+/** accountInfo 获取用户信息，用于检测cookie是否有效
  * 如果 spider已经停止，则不执行
- * 如果心跳失败，报401错误，则重新Login获取新的cookie
- * 如果心跳成功，则更新spider的cookies，并且更新至数据库
+ * 如果获取失败，报401错误，则重新Login获取新的cookie
+ * 如果获取成功，则更新spider的cookies，并且更新至数据库
  */
-func (s *Spider) heartbeat() bool {
+func (s *Spider) accountInfo() *accountInfoResp {
 	if s.Close {
-		return false
+		return nil
 	}
 	url := "https://ads.popin.cc/platform/api/campaignManager/accountInfo"
 	var e error
 	Colly := colly.NewCollector(colly.Async(false))
 	Colly.OnRequest(func(req *colly.Request) {
-		headerHandler(req.Headers)
+		accountInfoHeader(req.Headers)
 	})
-	Colly.SetCookies(s.Domain, s.Cookies)
+	Colly.SetCookies(url, s.Cookies)
+	resp := new(accountInfoResp)
 	Colly.OnResponse(func(r *colly.Response) {
 		if r.StatusCode != 200 {
 			e = errors.New("响应状态码不是200")
 			return
 		}
-		resp := new(HeartbeatResp)
 		//反序列化
 		err := json.Unmarshal(r.Body, resp)
 		if err != nil {
@@ -80,16 +81,21 @@ func (s *Spider) heartbeat() bool {
 			e = errors.New(string(r.Body))
 			return
 		}
-		//心跳成功
+		//访问成功
 		cookies := Colly.Cookies(url)
+		// for _, cookie := range cookies {
+		// 	fmt.Printf("%s:%s\n", cookie.Name, cookie.Value)
+		// }
 		//将新的cookies与旧cookies合并
-		mergeCookies(s.Cookies, cookies)
+		s.mergeCookies(cookies)
 		//更新数据库
 		if err := s.UpdateModelCookies(); err != nil {
 			e = fmt.Errorf("同步cookie至数据库失败:%w", err)
 		}
 	})
 	Colly.OnError(func(resp *colly.Response, err error) {
+		// cookie := resp.Request.Headers.Get("Cookie")
+		// fmt.Println("cookie:", cookie)
 		if resp.StatusCode == 401 {
 			e = AuthError
 		} else {
@@ -103,10 +109,25 @@ func (s *Spider) heartbeat() bool {
 	if e != nil {
 		//如果是401错误
 		if errors.Is(e, AuthError) {
-			global.LOG.Error("popin心跳失败，重新登录")
-			return false
+			global.LOG.Error("popin访问accountInfo无权限，请重新登录")
+			return nil
 		}
-		panic(fmt.Errorf(errorx.New("popin_Hearbeat失败", e)))
+		panic(fmt.Errorf(errorx.New("popin获取accountInfo失败", e)))
 	}
-	return true
+	return resp
+}
+
+func accountInfoHeader(headers *http.Header) {
+	headers.Add("authority", "ads.popin.cc")
+	headers.Add("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"99\", \"Google Chrome\";v=\"99\"")
+	headers.Add("accept", "application/json")
+	headers.Add("dnt", "1")
+	headers.Add("sec-ch-ua-mobile", "?0")
+	headers.Add("user-agent", UserAgent)
+	headers.Add("sec-ch-ua-platform", "\"macOS\"")
+	headers.Add("sec-fetch-site", "same-origin")
+	headers.Add("sec-fetch-mode", "cors")
+	headers.Add("sec-fetch-dest", "empty")
+	headers.Add("referer", "https://ads.popin.cc/platform/new_dashboard")
+	headers.Add("accept-language", "zh-CN,zh;q=0.9,zh-TW;q=0.8,ja;q=0.7")
 }

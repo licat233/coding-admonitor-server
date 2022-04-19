@@ -19,11 +19,21 @@ import (
  * 数据库加载cookie到spider
  */
 func (s *Spider) setCookies() {
+	baseCookies := []*http.Cookie{
+		genHttpCookie("currency", "TWD"),
+		genHttpCookie("new_db_trend", "spend"),
+	}
+	s.Cookies = append(s.Cookies, baseCookies...)
+
 	cookies, err := s.CookieModel.FindCookies()
 	if err != nil {
 		panic(fmt.Errorf("从数据库获取cookie失败:%w", err))
 	}
-	s.Cookies = []*http.Cookie{}
+	if len(cookies) == 0 {
+		//数据库中不存在cookie，需要登录获取
+		s.Login()
+		return
+	}
 	for _, cookie := range cookies {
 		hcookie := genHttpCookie(cookie.Name, cookie.Value)
 		s.Cookies = append(s.Cookies, hcookie)
@@ -76,24 +86,21 @@ func genHttpCookie(name, value string) *http.Cookie {
 
 var AuthError = fmt.Errorf("请求401错误，无权限访问，cookies失效")
 
-/** mergeCookies 合并两个cookie列表，
+/** mergeCookies 合并cookies到spider.Cookies中，
  * 如果有相同的cookie，则覆盖，
- * 如果没有相同的cookie，则新增到oldcookies中去
+ * 如果没有相同的cookie，则新增到spider.Cookies
  */
-func mergeCookies(oldCookies []*http.Cookie, newCookies []*http.Cookie) {
-	for _, newCookie := range newCookies {
-		isExist := false
-		for _, oldCookie := range oldCookies {
-			if newCookie.Name == oldCookie.Name {
-				isExist = true
-				oldCookie.Value = newCookie.Value
-				break
-			}
-		}
-		if isExist != true {
-			oldCookies = append(oldCookies, newCookie)
-		}
+func (s *Spider) mergeCookies(newCookies []*http.Cookie) {
+	allCookies := append(s.Cookies, newCookies...)
+	allM := map[string]string{}
+	for _, cookie := range allCookies {
+		allM[cookie.Name] = cookie.Value
 	}
+	cookies := []*http.Cookie{}
+	for name, value := range allM {
+		cookies = append(cookies, genHttpCookie(name, value))
+	}
+	s.Cookies = cookies
 }
 
 func cookiesToString(cookies []*model.Cookie) string {

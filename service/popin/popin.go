@@ -6,12 +6,12 @@ import (
 	"admonitor-server/common/timer"
 	"admonitor-server/service/popin/internal"
 	"fmt"
-	"sync"
 )
 
 type PopinServer struct {
 	PopinLogic *internal.PopinLogic
 	Timer      timer.Timer
+	StopCh     chan bool //通道
 }
 
 func NewPopinServer() *PopinServer {
@@ -21,38 +21,27 @@ func NewPopinServer() *PopinServer {
 	}
 }
 
-//Run 服务启动程序
-func Run() {
-	var stopCh = make(chan bool)
-	var wg sync.WaitGroup
+func (a *PopinServer) block() {
+	select {
+	case <-a.StopCh:
+		a.Stop()
+	}
+}
+
+func (a *PopinServer) Start() {
 	defer func() {
 		err := recover()
 		if err != nil {
 			if v, ok := err.(error); ok {
 				global.LOG.Error(errorx.New("已经停止PopinServer服务", v))
+				global.EMAIL.Send("PopinServer已停止")
 				fmt.Println(v.Error())
 			} else {
 				fmt.Println(err)
 			}
-			stopCh <- true
+			a.StopCh <- true
 		}
 	}()
-	popinServer := NewPopinServer()
-	popinServer.Start()
-	//保持程序后台运行
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		select {
-		case <-stopCh:
-			fmt.Println("PopinServer-Run程序结束运行")
-		}
-	}()
-
-	wg.Wait()
-}
-
-func (a *PopinServer) Start() {
 	global.LOG.Info("PopinServer启动中...")
 	fmt.Println("PopinServer启动中...")
 	// defer recovery.RecoverHandler()
@@ -81,10 +70,14 @@ func (a *PopinServer) Start() {
 	//提示
 	global.LOG.Info("PopinServer已启动")
 	fmt.Println("PopinServer已启动")
+	//锁住服务，防止服务关闭
+	a.block()
 }
 
 func (a *PopinServer) Stop() {
 	a.Timer.Close()
+	a.StopCh <- true
+	close(a.StopCh)
 	global.LOG.Info("PopinServer已停止")
 	fmt.Println("PopinServer已停止")
 }

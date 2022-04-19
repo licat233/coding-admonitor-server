@@ -1,6 +1,7 @@
 package global
 
 import (
+	"admonitor-server/common/emailx"
 	"admonitor-server/common/timer"
 
 	"github.com/go-redis/redis/v8"
@@ -13,4 +14,5 @@ var (
 	DB    *gorm.DB
 	TIMER timer.Timer
 	REDIS *redis.Client
+	EMAIL *emailx.Email
 )

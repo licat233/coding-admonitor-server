@@ -51,7 +51,7 @@ func NewSpider() *Spider {
 		CacheStatistics: new(StatisticsResp),
 		CacheUrl:        "",
 		StaticTime:      time.Time{},
-		Cookies:         nil,
+		Cookies:         []*http.Cookie{},
 		Domain:          "account.line.biz",
 		Close:           false,
 		LoginTime:       time.Time{},

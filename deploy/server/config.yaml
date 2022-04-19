@@ -13,6 +13,13 @@ redis:
   addr: 127.0.0.1:6379
   pass: ""
   db: 1
+email:
+  username: "licat233@qq.com"
+  password: "myfppwmqfkombffh"
+  host: smtp.qq.com
+  port: 465
+  receiver: 
+    - "licat233@gmail.com"
 line:
   login-info: 
     email: licat233@gmail.com
