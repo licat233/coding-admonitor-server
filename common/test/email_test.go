@@ -8,7 +8,7 @@ import (
 
 func Test_emailx(t *testing.T) {
 	config.Initialize()
-	err := emailx.NewEmail().Send("测试内容")
+	err := emailx.Send("测试内容")
 	if err != nil {
 		t.Error(err)
 	}

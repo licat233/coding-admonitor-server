@@ -287,7 +287,7 @@ func (l *LineLogic) monitorHandler(line *model.Line, Type string) {
 	msg := strings.Join(warnMsg, "\n</br>")
 	b, _ := json.Marshal(line)
 	logicData := fmt.Sprintf("当前%s数据：%s", typename, string(b))
-	go emailx.Send(msg + logicData)
+	go emailx.Send(msg + logicData) //使用协程发送邮件
 	return
 }
 
