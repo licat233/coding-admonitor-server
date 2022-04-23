@@ -35,7 +35,7 @@ func (a *PopinServer) Start() {
 		if err != nil {
 			if v, ok := err.(error); ok {
 				global.LOG.Error(errorx.New("已经停止PopinServer服务", v))
-				emailx.Send("PopinServer已停止")
+				emailx.Send(fmt.Sprintf("PopinServer已停止:%s", v.Error()))
 				fmt.Println(v.Error())
 			} else {
 				fmt.Println(err)

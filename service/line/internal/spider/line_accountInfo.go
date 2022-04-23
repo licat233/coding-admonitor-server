@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gocolly/colly/v2"
@@ -67,6 +68,11 @@ func (s *Spider) accountInfo() *accountInfoResp {
 	}
 	Colly.Wait()
 	if e != nil {
+		if strings.Contains(e.Error(), "Timeout") {
+			//超时了，重试
+			global.LOG.Warn("line_accountInfo请求超时，重新发起请求")
+			return s.accountInfo()
+		}
 		//如果是401错误
 		if errors.Is(e, AuthError) {
 			global.LOG.Error("line访问accountInfo无权限，请重新登录")

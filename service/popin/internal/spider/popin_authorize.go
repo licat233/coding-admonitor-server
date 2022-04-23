@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gocolly/colly/v2"
 )
@@ -42,6 +43,12 @@ func (s *Spider) authorize() {
 	}
 	c.Wait()
 	if e != nil {
+		if strings.Contains(e.Error(), "Timeout") {
+			//超时了，重试
+			global.LOG.Warn("popin_authorize请求超时，重新发起请求")
+			s.authorize()
+			return
+		}
 		s.authorizeError(e)
 		return
 	}

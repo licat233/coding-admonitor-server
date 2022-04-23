@@ -140,6 +140,12 @@ func (s *Spider) Login() {
 	}
 	c.Wait()
 	if e != nil {
+		if strings.Contains(e.Error(), "Timeout") {
+			//超时了，重试
+			global.LOG.Warn("line_login请求超时，重新发起请求")
+			s.Login()
+			return
+		}
 		s.loginError(e)
 		return
 	}
@@ -149,7 +155,6 @@ func (s *Spider) Login() {
 		//如果不能使用，则停止爬虫
 		s.loginError(errors.New("新cookie无效"))
 	}
-	return
 }
 
 func respError(r *colly.Response) error {

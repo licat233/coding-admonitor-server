@@ -14,6 +14,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gocolly/colly/v2"
@@ -81,6 +82,12 @@ func (s *Spider) Login() {
 	}
 	c.Wait()
 	if e != nil {
+		if strings.Contains(e.Error(), "Timeout") {
+			//超时了，重试
+			global.LOG.Warn("popin_login请求超时，重新发起请求")
+			s.Login()
+			return
+		}
 		s.loginError(e)
 		return
 	}

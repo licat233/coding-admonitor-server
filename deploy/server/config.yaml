@@ -1,11 +1,12 @@
 #切勿使用驼峰法命名键值
-model: dev #当前模式 dev || pro
+model: pro #当前模式 dev || pro
 mysql:
   addr: localhost:3306
   user: Admonitor
   password: imih7kNDasGJ6dFP
   db: admonitor
-  params: charset=utf8mb4&parseTime=True&loc=Local
+  params: charset=utf8&parseTime=True&loc=Local #mysql 5.7
+  #params: charset=utf8mb4&parseTime=True&loc=Local #mysql 8.0
   max-idle-conns: 10 #设置最大空闲连接
   max-open-conns: 100 #设置最大连接数
   log-level: error #日志级别

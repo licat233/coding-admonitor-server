@@ -35,7 +35,7 @@ func (a *LineServer) Start() {
 		if err != nil {
 			if v, ok := err.(error); ok {
 				global.LOG.Error(errorx.New("已经停止LineServer服务", v))
-				emailx.Send("LineServer已停止")
+				emailx.Send(fmt.Sprintf("LineServer已停止:%s", v.Error()))
 				fmt.Println(v.Error())
 			} else {
 				fmt.Println(err)

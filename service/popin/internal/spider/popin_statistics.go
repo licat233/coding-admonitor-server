@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gocolly/colly/v2"
@@ -87,6 +88,7 @@ func (s *Spider) Statistics(date time.Time) (resp *StatisticsResp) {
 	}
 
 	Colly := colly.NewCollector(colly.Async(false))
+	Colly.SetRequestTimeout(120 * time.Second)
 	Colly.OnRequest(func(req *colly.Request) {
 		statisticsHeader(req.Headers)
 	})
@@ -124,13 +126,14 @@ func (s *Spider) Statistics(date time.Time) (resp *StatisticsResp) {
 	}
 	Colly.Wait()
 	if e != nil {
+		if strings.Contains(e.Error(), "Timeout") {
+			//超时了，重试
+			global.LOG.Warn("popin_statistics请求超时，重新发起请求")
+			return s.Statistics(date)
+		}
 		s.statisticsError(e)
 		return
 	}
-	//echo
-	// for _, cookie := range Colly.Cookies(url) {
-	// 	fmt.Printf("%s=%s\n", cookie.Name, cookie.Value)
-	// }
 	return resp
 }
 
