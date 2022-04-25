@@ -101,28 +101,28 @@ func (s *Spider) Login() {
 			global.LOG.Info("line登录成功")
 			//登录成功，获取该网站的cookies
 			// fmt.Println(r.Headers.Get("Set-Cookie"))
-			// cookies := c.Cookies(url)
-			cookies := []*http.Cookie{}
-			//注意:line的cookie故意以==结尾，所以colly自动提取到的cookie值结尾会少一个=号，保险起见，我们自己提取
-			cookieValues := r.Headers.Values("Set-Cookie")
-			for _, value := range cookieValues {
-				//查找第一个【;】位置
-				index1 := strings.Index(value, ";")
-				if index1 == -1 {
-					continue
-				}
-				//截取字符串
-				s1 := value[:index1]
-				//查找第一个【=】位置
-				index2 := strings.Index(s1, "=")
-				if index2 == -1 {
-					continue
-				}
-				//截取字符串
-				name := s1[:index2]
-				value := s1[index2+1:]
-				cookies = append(cookies, genHttpCookie(name, value))
-			}
+			cookies := c.Cookies(url)
+			// cookies := []*http.Cookie{}
+			//注意:line的cookie有时以==结尾，所以colly自动提取到的cookie值结尾会少一个=号，保险起见，我们自己提取
+			// cookieValues := r.Headers.Values("Set-Cookie")
+			// for _, value := range cookieValues {
+			// 	//查找第一个【;】位置
+			// 	index1 := strings.Index(value, ";")
+			// 	if index1 == -1 {
+			// 		continue
+			// 	}
+			// 	//截取字符串
+			// 	s1 := value[:index1]
+			// 	//查找第一个【=】位置
+			// 	index2 := strings.Index(s1, "=")
+			// 	if index2 == -1 {
+			// 		continue
+			// 	}
+			// 	//截取字符串
+			// 	name := s1[:index2]
+			// 	value := s1[index2+1:]
+			// 	cookies = append(cookies, genHttpCookie(name, value))
+			// }
 			//更新spider的cookies
 			s.mergeCookies(cookies)
 			//更新数据库
@@ -150,11 +150,11 @@ func (s *Spider) Login() {
 		return
 	}
 	global.LOG.Info("line登录成功")
-	//即使登录成功，也要使用accountInfo()检测一下新的cookie是否可用
-	if s.accountInfo() == nil {
-		//如果不能使用，则停止爬虫
-		s.loginError(errors.New("新cookie无效"))
-	}
+	//即使登录成功，也要使用accountInfo()检测一下新的cookie是否可用，这里检测会失败
+	// if s.accountInfo() == nil {
+	// 	//如果不能使用，则停止爬虫
+	// 	s.loginError(errors.New("新cookie无效"))
+	// }
 }
 
 func respError(r *colly.Response) error {

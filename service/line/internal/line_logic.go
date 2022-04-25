@@ -451,10 +451,10 @@ func (l *LineLogic) LogicLineDataByDate(account string, date time.Time) (*model.
  * @param: nodeLine type *model.Line 今天最新消耗或者节点消耗
  */
 func (l *LineLogic) CalculateOnNodeBefore(yerDayLine, yerNodeLine, nodeLine *model.Line) *model.Line {
-	cost, ok := decimal.NewFromFloat(yerDayLine.Cost).Sub(decimal.NewFromFloat(yerNodeLine.Cost)).Add(decimal.NewFromFloat(nodeLine.Cost)).Round(2).Float64()
-	if !ok {
-		cost = yerDayLine.Cost - yerNodeLine.Cost + nodeLine.Cost
-	}
+	cost, _ := decimal.NewFromFloat(yerDayLine.Cost).Sub(decimal.NewFromFloat(yerNodeLine.Cost)).Add(decimal.NewFromFloat(nodeLine.Cost)).Round(2).Float64()
+	// if !ok {
+	// 	cost = yerDayLine.Cost - yerNodeLine.Cost + nodeLine.Cost
+	// }
 	click := yerDayLine.Click - yerNodeLine.Click + nodeLine.Click
 	imp := yerDayLine.Imp - yerNodeLine.Imp + nodeLine.Imp
 	cv := yerDayLine.Cv - yerNodeLine.Cv + nodeLine.Cv
@@ -486,10 +486,10 @@ func (l *LineLogic) CalculateOnNodeBefore(yerDayLine, yerNodeLine, nodeLine *mod
  * @param: newestLine type *model.Line 当前的最新line数据
  */
 func (l *LineLogic) CalculateOnNodeAfter(newestLine, nodeLine *model.Line) *model.Line {
-	cost, ok := decimal.NewFromFloat(newestLine.Cost).Sub(decimal.NewFromFloat(nodeLine.Cost)).Round(2).Float64()
-	if !ok {
-		cost = newestLine.Cost - nodeLine.Cost
-	}
+	cost, _ := decimal.NewFromFloat(newestLine.Cost).Sub(decimal.NewFromFloat(nodeLine.Cost)).Round(2).Float64()
+	// if !ok {
+	// 	cost = newestLine.Cost - nodeLine.Cost
+	// }
 	click := newestLine.Click - nodeLine.Click
 	imp := newestLine.Imp - nodeLine.Imp
 	cv := newestLine.Cv - nodeLine.Cv

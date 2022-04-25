@@ -22,6 +22,8 @@ func (s *Spider) setCookies() {
 	baseCookies := []*http.Cookie{
 		genHttpCookie("currency", "TWD"),
 		genHttpCookie("new_db_trend", "spend"),
+		genHttpCookie("db_campaign", "Management#campaignName%2CCost#spend%2CCampaigns#campaignBalance%2CTrafficAcquisition#cpc%2CTrafficAcquisition#impression%2CTrafficAcquisition#click%2CTrafficAcquisition#ctr%2Cconversion#conversion%2Cconversion#conversionRate"),
+		genHttpCookie("db_account", "Management#accountName%2CCost#spend%2CTrafficAcquisition#avgCpc%2CTrafficAcquisition#impression%2CTrafficAcquisition#click%2CTrafficAcquisition#ctr%2Cconversion#conversion%2Cconversion#conversionRate%2Cconversion#conversionPrice"),
 	}
 	s.Cookies = append(s.Cookies, baseCookies...)
 

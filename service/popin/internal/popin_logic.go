@@ -450,10 +450,10 @@ func (l *PopinLogic) LogicPopinDataByDate(account string, date time.Time) (*mode
  * @param: nodePopin type *model.Popin 今天最新消耗或者节点消耗
  */
 func (l *PopinLogic) CalculateOnNodeBefore(yerDayPopin, yerNodePopin, nodePopin *model.Popin) *model.Popin {
-	cost, ok := decimal.NewFromFloat(yerDayPopin.Cost).Sub(decimal.NewFromFloat(yerNodePopin.Cost)).Add(decimal.NewFromFloat(nodePopin.Cost)).Round(2).Float64()
-	if !ok {
-		cost = yerDayPopin.Cost - yerNodePopin.Cost + nodePopin.Cost
-	}
+	cost, _ := decimal.NewFromFloat(yerDayPopin.Cost).Sub(decimal.NewFromFloat(yerNodePopin.Cost)).Add(decimal.NewFromFloat(nodePopin.Cost)).Round(2).Float64()
+	// if !ok {
+	// 	cost = yerDayPopin.Cost - yerNodePopin.Cost + nodePopin.Cost
+	// }
 	click := yerDayPopin.Click - yerNodePopin.Click + nodePopin.Click
 	imp := yerDayPopin.Imp - yerNodePopin.Imp + nodePopin.Imp
 	cv := yerDayPopin.Cv - yerNodePopin.Cv + nodePopin.Cv
@@ -485,10 +485,10 @@ func (l *PopinLogic) CalculateOnNodeBefore(yerDayPopin, yerNodePopin, nodePopin 
  * @param: newestPopin type *model.Popin 当前的最新popin数据
  */
 func (l *PopinLogic) CalculateOnNodeAfter(newestPopin, nodePopin *model.Popin) *model.Popin {
-	cost, ok := decimal.NewFromFloat(newestPopin.Cost).Sub(decimal.NewFromFloat(nodePopin.Cost)).Round(2).Float64()
-	if !ok {
-		cost = newestPopin.Cost - nodePopin.Cost
-	}
+	cost, _ := decimal.NewFromFloat(newestPopin.Cost).Sub(decimal.NewFromFloat(nodePopin.Cost)).Round(2).Float64()
+	// if !ok {
+	// 	cost = newestPopin.Cost - nodePopin.Cost
+	// }
 	click := newestPopin.Click - nodePopin.Click
 	imp := newestPopin.Imp - nodePopin.Imp
 	cv := newestPopin.Cv - nodePopin.Cv
