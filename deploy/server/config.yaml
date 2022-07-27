@@ -1,0 +1,36 @@
+#切勿使用驼峰法命名键值
+model: pro #当前模式 dev || pro
+mysql:
+  addr: 127.0.0.1:3306
+  # addr: 119.91.140.95:3306
+  user: Admonitor
+  password: imih7kNDasGJ6dFP
+  db: admonitor
+  params: charset=utf8&parseTime=True&loc=Local #mysql 5.7
+  # params: charset=utf8mb4&parseTime=True&loc=Local #mysql 8.0
+  max-idle-conns: 10 #设置最大空闲连接
+  max-open-conns: 100 #设置最大连接数
+  log-level: error #日志级别
+redis:
+  addr: 127.0.0.1:6379
+  pass: ""
+  db: 1
+email:
+  username: "licat233@qq.com"
+  password: "myfppwmqfkombffh"
+  # username: "641551414@qq.com"
+  # password: "citxtcislxoibbeg"
+  host: smtp.qq.com
+  port: 465
+  receiver: 
+    - "1697470538@qq.com"
+wxapp:
+  appid: wxa14d75d901d84658
+  secret: 55f72b4f9cbe21a76f509d644f09974e
+  grant_type: authorization_code
+api-server:
+  port: 2333
+  jwtkey: licatmoodmomentapp
+zap:
+  log-dir: logs
+  log-file: system.log

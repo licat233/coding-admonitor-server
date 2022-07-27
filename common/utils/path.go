@@ -1,0 +1,63 @@
+package utils
+
+import (
+	"log"
+	"os"
+	"path"
+	"path/filepath"
+	"regexp"
+	"runtime"
+	"strings"
+)
+
+//获取当前项目地址
+func CurrentProjectRootPath() string {
+	fullPath := getCurrentAbPath()
+	reg := regexp.MustCompile("^.*Admonitor-server/")
+	matched := reg.FindString(fullPath)
+	return matched
+}
+
+// 最终方案-全兼容
+func getCurrentAbPath() string {
+	dir := getCurrentAbPathByExecutable()
+	//如果是 go run 启动的
+	tmpPath := getTmpDir()
+	if tmpPath == "." {
+		return getCurrentAbPathByCaller()
+	}
+	if strings.Contains(dir, getTmpDir()) {
+		return getCurrentAbPathByCaller()
+	}
+	return dir
+}
+
+// 获取系统临时目录，兼容go run
+func getTmpDir() string {
+	dir := os.Getenv("TEMP")
+	if dir == "" {
+		dir = os.Getenv("TMP")
+	}
+	res, _ := filepath.EvalSymlinks(dir)
+	return res
+}
+
+// 获取当前执行文件绝对路径（仅支持go build）
+func getCurrentAbPathByExecutable() string {
+	exePath, err := os.Executable()
+	if err != nil {
+		log.Fatal(err)
+	}
+	res, _ := filepath.EvalSymlinks(filepath.Dir(exePath))
+	return res
+}
+
+// 获取当前执行文件绝对路径（仅支持go run）
+func getCurrentAbPathByCaller() string {
+	var abPath string
+	_, filename, _, ok := runtime.Caller(0)
+	if ok {
+		abPath = path.Dir(filename)
+	}
+	return abPath
+}

@@ -1,0 +1,21 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default"
+            },
+            "previewLimit": 50,
+            "server": "119.91.140.95",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "2h4g8m",
+            "database": "admonitor",
+            "username": "Admonitor",
+            "password": "imih7kNDasGJ6dFP"
+        }
+    ],
+    "cSpell.words": [
+        "datas",
+        "respx"
+    ]
+}
